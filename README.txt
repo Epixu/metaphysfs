@@ -1,3 +1,6 @@
+WORK IN PROGRESS
+
+-----
 
 PhysicsFS; a portable, flexible file i/o abstraction.
 
