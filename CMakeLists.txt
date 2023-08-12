@@ -8,17 +8,38 @@
 #  built PhysicsFS to (hopefully) be able to drop into your project and
 #  compile, using preprocessor checks for platform-specific bits instead of
 #  testing in here.
+cmake_minimum_required(VERSION 3.24)
 
-set(PHYSFS_VERSION 3.3.0)
+project(MetaPhysicsFS
+    DESCRIPTION "MetaPhysicsFS; a portable, flexible file i/o abstraction built on top of PhysicsFS"
+    HOMEPAGE_URL "https://github.com/Epixu/metaphysfs"
+    VERSION 1.0.0
+    LANGUAGES CXX
+)
 
-cmake_minimum_required(VERSION 3.5)
+# Public options                                                                
+option(METAPHYSFS_ARCHIVE_ZIP       "Enable ZIP support" TRUE)
+option(METAPHYSFS_ARCHIVE_7Z        "Enable 7zip support" TRUE)
+option(METAPHYSFS_ARCHIVE_GRP       "Enable Build Engine GRP support" TRUE)
+option(METAPHYSFS_ARCHIVE_WAD       "Enable Doom WAD support" TRUE)
+option(METAPHYSFS_ARCHIVE_CSM       "Enable Chasm: The Rift CSM.BIN support" TRUE)
+option(METAPHYSFS_ARCHIVE_HOG       "Enable Descent I/II HOG support" TRUE)
+option(METAPHYSFS_ARCHIVE_MVL       "Enable Descent I/II MVL support" TRUE)
+option(METAPHYSFS_ARCHIVE_QPAK      "Enable Quake I/II QPAK support" TRUE)
+option(METAPHYSFS_ARCHIVE_SLB       "Enable I-War / Independence War SLB support" TRUE)
+option(METAPHYSFS_ARCHIVE_ISO9660   "Enable ISO9660 support" TRUE)
+option(METAPHYSFS_ARCHIVE_VDF       "Enable Gothic I/II VDF archive support" TRUE)
+option(METAPHYSFS_BUILD_STATIC      "Build static library" TRUE)
+option(METAPHYSFS_BUILD_SHARED      "Build shared library" TRUE)
+option(METAPHYSFS_BUILD_TEST        "Build stdio test program." TRUE)
+option(METAPHYSFS_DISABLE_INSTALL   "Disable installing MetaPhysFS" OFF)
+option(METAPHYSFS_BUILD_DOCS        "Build doxygen based documentation" TRUE)
 
-project(PhysicsFS VERSION ${PHYSFS_VERSION} LANGUAGES C )
+
+message("Compiler: ${CMAKE_CXX_COMPILER_ID} - ${CMAKE_CXX_COMPILER_VERSION}")
 
 include(GNUInstallDirs)
 
-# Increment this if/when we break backwards compatibility.
-set(PHYSFS_SOVERSION 1)
 
 set(PHYSFS_M_SRCS)
 set(PHYSFS_CPP_SRCS)
@@ -30,15 +51,6 @@ endif()
 if(APPLE)
     set(OTHER_LDFLAGS ${OTHER_LDFLAGS} "-framework IOKit -framework Foundation")
     list(APPEND PHYSFS_M_SRCS src/physfs_platform_apple.m)
-endif()
-
-if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
-    add_compile_options(-Wall)
-endif()
-
-if(CMAKE_C_COMPILER_ID STREQUAL "SunPro")
-    add_definitions(-erroff=E_EMPTY_TRANSLATION_UNIT)
-    add_definitions(-xldscope=hidden)
 endif()
 
 if(HAIKU)
@@ -63,10 +75,6 @@ if(UNIX AND NOT WIN32 AND NOT APPLE)  # (MingW and such might be UNIX _and_ WIND
     if(PTHREAD_LIBRARY)
         list(APPEND OPTIONAL_LIBRARY_LIBS ${PTHREAD_LIBRARY})
     endif()
-endif()
-
-if(PHYSFS_CPP_SRCS)
-    enable_language(CXX)
 endif()
 
 # Almost everything is "compiled" here, but things that don't apply to the
@@ -100,68 +108,6 @@ set(PHYSFS_SRCS
     ${PHYSFS_M_SRCS}
 )
 
-
-# Archivers ...
-# These are (mostly) on by default now, so these options are only useful for
-#  disabling them.
-
-option(PHYSFS_ARCHIVE_ZIP "Enable ZIP support" TRUE)
-if(NOT PHYSFS_ARCHIVE_ZIP)
-    add_definitions(-DPHYSFS_SUPPORTS_ZIP=0)
-endif()
-
-option(PHYSFS_ARCHIVE_7Z "Enable 7zip support" TRUE)
-if(NOT PHYSFS_ARCHIVE_7Z)
-    add_definitions(-DPHYSFS_SUPPORTS_7Z=0)
-endif()
-
-option(PHYSFS_ARCHIVE_GRP "Enable Build Engine GRP support" TRUE)
-if(NOT PHYSFS_ARCHIVE_GRP)
-    add_definitions(-DPHYSFS_SUPPORTS_GRP=0)
-endif()
-
-option(PHYSFS_ARCHIVE_WAD "Enable Doom WAD support" TRUE)
-if(NOT PHYSFS_ARCHIVE_WAD)
-    add_definitions(-DPHYSFS_SUPPORTS_WAD=0)
-endif()
-
-option(PHYSFS_ARCHIVE_CSM "Enable Chasm: The Rift CSM.BIN support" TRUE)
-if(NOT PHYSFS_ARCHIVE_CSM)
-    add_definitions(-DPHYSFS_SUPPORTS_CSM=0)
-endif()
-
-option(PHYSFS_ARCHIVE_HOG "Enable Descent I/II HOG support" TRUE)
-if(NOT PHYSFS_ARCHIVE_HOG)
-    add_definitions(-DPHYSFS_SUPPORTS_HOG=0)
-endif()
-
-option(PHYSFS_ARCHIVE_MVL "Enable Descent I/II MVL support" TRUE)
-if(NOT PHYSFS_ARCHIVE_MVL)
-    add_definitions(-DPHYSFS_SUPPORTS_MVL=0)
-endif()
-
-option(PHYSFS_ARCHIVE_QPAK "Enable Quake I/II QPAK support" TRUE)
-if(NOT PHYSFS_ARCHIVE_QPAK)
-    add_definitions(-DPHYSFS_SUPPORTS_QPAK=0)
-endif()
-
-option(PHYSFS_ARCHIVE_SLB "Enable I-War / Independence War SLB support" TRUE)
-if(NOT PHYSFS_ARCHIVE_SLB)
-    add_definitions(-DPHYSFS_SUPPORTS_SLB=0)
-endif()
-
-option(PHYSFS_ARCHIVE_ISO9660 "Enable ISO9660 support" TRUE)
-if(NOT PHYSFS_ARCHIVE_ISO9660)
-    add_definitions(-DPHYSFS_SUPPORTS_ISO9660=0)
-endif()
-
-option(PHYSFS_ARCHIVE_VDF "Enable Gothic I/II VDF archive support" TRUE)
-if(NOT PHYSFS_ARCHIVE_VDF)
-    add_definitions(-DPHYSFS_SUPPORTS_VDF=0)
-endif()
-
-
-option(PHYSFS_BUILD_STATIC "Build static library" TRUE)
 if(PHYSFS_BUILD_STATIC)
     add_library(physfs-static STATIC ${PHYSFS_SRCS})
     add_library(PhysFS::PhysFS-static ALIAS physfs-static)
@@ -188,7 +134,6 @@ if(PHYSFS_BUILD_STATIC)
     list(APPEND PHYSFS_INSTALL_TARGETS "physfs-static")
 endif()
 
-option(PHYSFS_BUILD_SHARED "Build shared library" TRUE)
 if(PHYSFS_BUILD_SHARED)
     add_library(physfs SHARED ${PHYSFS_SRCS})
     add_library(PhysFS::PhysFS ALIAS physfs)
@@ -212,7 +157,6 @@ if(NOT PHYSFS_BUILD_SHARED AND NOT PHYSFS_BUILD_STATIC)
     message(FATAL "Both shared and static libraries are disabled!")
 endif()
 
-option(PHYSFS_BUILD_TEST "Build stdio test program." TRUE)
 mark_as_advanced(PHYSFS_BUILD_TEST)
 if(PHYSFS_BUILD_TEST)
     add_executable(test_physfs test/test_physfs.c)
@@ -231,7 +175,6 @@ if(PHYSFS_BUILD_TEST)
     list(APPEND PHYSFS_INSTALL_TARGETS test_physfs)
 endif()
 
-option(PHYSFS_DISABLE_INSTALL "Disable installing PhysFS" OFF)
 if(NOT PHYSFS_DISABLE_INSTALL)
 
     install(TARGETS ${PHYSFS_INSTALL_TARGETS} EXPORT PhysFSExport
@@ -261,34 +204,6 @@ if(NOT PHYSFS_DISABLE_INSTALL)
     endif()
 endif()
 
-option(PHYSFS_BUILD_DOCS "Build doxygen based documentation" TRUE)
-if(PHYSFS_BUILD_DOCS)
-    find_package(Doxygen)
-    if(DOXYGEN_FOUND)
-        set(PHYSFS_OUTPUT_DOXYFILE "${CMAKE_CURRENT_BINARY_DIR}/Doxyfile")
-        configure_file(
-            "${CMAKE_CURRENT_SOURCE_DIR}/docs/Doxyfile"
-            "${PHYSFS_OUTPUT_DOXYFILE}"
-            COPYONLY
-        )
-        file(APPEND "${PHYSFS_OUTPUT_DOXYFILE}" "\n\n# Below auto-generated by cmake...\n\n")
-        file(APPEND "${PHYSFS_OUTPUT_DOXYFILE}" "PROJECT_NUMBER = \"${PHYSFS_VERSION}\"\n")
-        file(APPEND "${PHYSFS_OUTPUT_DOXYFILE}" "OUTPUT_DIRECTORY = \"${CMAKE_CURRENT_BINARY_DIR}/docs\"\n")
-        file(APPEND "${PHYSFS_OUTPUT_DOXYFILE}" "\n# End auto-generated section.\n\n")
-
-        set(PHYSFS_TARGETNAME_DOCS "docs" CACHE STRING "Name of 'docs' build target")
-
-        add_custom_target(
-            ${PHYSFS_TARGETNAME_DOCS}
-            ${DOXYGEN_EXECUTABLE} "${PHYSFS_OUTPUT_DOXYFILE}"
-            WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-            COMMENT "Building documentation in 'docs' directory..."
-        )
-
-    else()
-        message(STATUS "Doxygen not found. You won't be able to build documentation.")
-    endif()
-endif()
 
 if(UNIX)
     set(PHYSFS_TARBALL "${CMAKE_CURRENT_SOURCE_DIR}/../physfs-${PHYSFS_VERSION}.tar.gz")
@@ -310,33 +225,47 @@ if(UNIX)
     )
 endif()
 
+# Toggle compiler options                                                       
+target_compile_options(MetaPhysicsFS PRIVATE
+  $<$<CXX_COMPILER_ID:MSVC>:    /W4 /WX>
+  $<$<CXX_COMPILER_ID:Clang>:   -Wall -Wextra -Wpedantic -Werror>
+  $<$<CXX_COMPILER_ID:GNU>:     -Wall -Wextra -Wpedantic -Werror>
+  $<$<CXX_COMPILER_ID:SunPro>:  -xldscope=hidden>
+)
 
-macro(message_bool_option _NAME _VALUE)
-    if(${_VALUE})
-        message(STATUS "  ${_NAME}: enabled")
+# Reflect enabled archivers                                                     
+macro(reflect_option FORMAT VALUE)
+    if(${VALUE})
+        target_compile_definitions(MetaPhysFS PRIVATE "METAPHYSFS_SUPPORTS_${FORMAT}=1")
+        message(STATUS "  ${FORMAT} support: enabled")
     else()
-        message(STATUS "  ${_NAME}: disabled")
+        target_compile_definitions(MetaPhysFS PRIVATE "METAPHYSFS_SUPPORTS_${FORMAT}=0")
+        message(STATUS "  ${FORMAT} support: disabled")
     endif()
 endmacro()
 
-message(STATUS "PhysicsFS will build with the following options:")
-message_bool_option("ZIP support" PHYSFS_ARCHIVE_ZIP)
-message_bool_option("7zip support" PHYSFS_ARCHIVE_7Z)
-message_bool_option("GRP support" PHYSFS_ARCHIVE_GRP)
-message_bool_option("WAD support" PHYSFS_ARCHIVE_WAD)
-message_bool_option("CSM support" PHYSFS_ARCHIVE_CSM)
-message_bool_option("HOG support" PHYSFS_ARCHIVE_HOG)
-message_bool_option("MVL support" PHYSFS_ARCHIVE_MVL)
-message_bool_option("QPAK support" PHYSFS_ARCHIVE_QPAK)
-message_bool_option("SLB support" PHYSFS_ARCHIVE_SLB)
-message_bool_option("VDF support" PHYSFS_ARCHIVE_VDF)
-message_bool_option("ISO9660 support" PHYSFS_ARCHIVE_ISO9660)
-message_bool_option("Build static library" PHYSFS_BUILD_STATIC)
-message_bool_option("Build shared library" PHYSFS_BUILD_SHARED)
-message_bool_option("Build stdio test program" PHYSFS_BUILD_TEST)
-message_bool_option("Build Doxygen documentation" PHYSFS_BUILD_DOCS)
-if(PHYSFS_BUILD_TEST)
-    message_bool_option("  Use readline in test program" HAVE_SYSTEM_READLINE)
+message(STATUS "MetaPhysicsFS will build with the following options:")
+reflect_option("ZIP"        METAPHYSFS_ARCHIVE_ZIP)
+reflect_option("7zip"       METAPHYSFS_ARCHIVE_7Z)
+reflect_option("GRP"        METAPHYSFS_ARCHIVE_GRP)
+reflect_option("WAD"        METAPHYSFS_ARCHIVE_WAD)
+reflect_option("CSM"        METAPHYSFS_ARCHIVE_CSM)
+reflect_option("HOG"        METAPHYSFS_ARCHIVE_HOG)
+reflect_option("MVL"        METAPHYSFS_ARCHIVE_MVL)
+reflect_option("QPAK"       METAPHYSFS_ARCHIVE_QPAK)
+reflect_option("SLB"        METAPHYSFS_ARCHIVE_SLB)
+reflect_option("VDF"        METAPHYSFS_ARCHIVE_VDF)
+reflect_option("ISO9660"    METAPHYSFS_ARCHIVE_ISO9660)
+
+# Toggle testing                                                                
+if(METAPHYSFS_ENABLE_TESTING)
+    message(STATUS "MetaPhysicsFS will build tests")
+    enable_testing()
+    add_subdirectory(test)
 endif()
 
-# end of CMakeLists.txt ...
+# Generate documentation                                                        
+if(PHYSFS_BUILD_DOCS)
+    find_package(Doxygen)
+    add_subdirectory(docs)
+endif()
