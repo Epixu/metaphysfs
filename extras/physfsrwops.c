@@ -195,14 +195,14 @@ static int physfsrwops_close(SDL_RWops *rw)
 
 static SDL_RWops *create_rwops(PHYSFS_File *handle)
 {
-    SDL_RWops *retval = NULL;
+    SDL_RWops *retval = nullptr;
 
-    if (handle == NULL)
+    if (handle == nullptr)
         SDL_SetError("PhysicsFS error: %s", PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
     else
     {
         retval = SDL_AllocRW();
-        if (retval != NULL)
+        if (retval != nullptr)
         {
             #if TARGET_SDL2
             retval->size  = physfsrwops_size;
@@ -221,9 +221,9 @@ static SDL_RWops *create_rwops(PHYSFS_File *handle)
 
 SDL_RWops *PHYSFSRWOPS_makeRWops(PHYSFS_File *handle)
 {
-    SDL_RWops *retval = NULL;
-    if (handle == NULL)
-        SDL_SetError("NULL pointer passed to PHYSFSRWOPS_makeRWops().");
+    SDL_RWops *retval = nullptr;
+    if (handle == nullptr)
+        SDL_SetError("nullptr pointer passed to PHYSFSRWOPS_makeRWops().");
     else
         retval = create_rwops(handle);
 

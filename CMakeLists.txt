@@ -102,7 +102,6 @@ endif()
 #  code and #define the things you want.
 set(PHYSFS_SRCS
     src/physfs.cpp
-    src/physfs_byteorder.cpp
     src/physfs_unicode.cpp
     src/physfs_platform_posix.cpp
     src/physfs_platform_unix.cpp
@@ -115,16 +114,16 @@ set(PHYSFS_SRCS
     src/physfs_archiver_dir.cpp
     src/physfs_archiver_unpacked.cpp
 	$<$<BOOL:${METAPHYSFS_ARCHIVE_GRP}>:src/physfs_archiver_grp.cpp>
-    src/physfs_archiver_hog.cpp
-    src/physfs_archiver_7z.cpp
-    src/physfs_archiver_mvl.cpp
+	$<$<BOOL:${METAPHYSFS_ARCHIVE_HOG}>:src/physfs_archiver_hog.cpp>
+	$<$<BOOL:${METAPHYSFS_ARCHIVE_7Z}>:src/physfs_archiver_7z.cpp>
+	$<$<BOOL:${METAPHYSFS_ARCHIVE_MVL}>:src/physfs_archiver_mvl.cpp>
 	$<$<BOOL:${METAPHYSFS_ARCHIVE_QPAK}>:src/physfs_archiver_qpak.cpp>
-    src/physfs_archiver_wad.cpp
-    src/physfs_archiver_csm.cpp
-    src/physfs_archiver_zip.cpp
-    src/physfs_archiver_slb.cpp
-    src/physfs_archiver_iso9660.cpp
-    src/physfs_archiver_vdf.cpp
+	$<$<BOOL:${METAPHYSFS_ARCHIVE_WAD}>:src/physfs_archiver_wad.cpp>
+	$<$<BOOL:${METAPHYSFS_ARCHIVE_CSM}>:src/physfs_archiver_csm.cpp>
+	$<$<BOOL:${METAPHYSFS_ARCHIVE_ZIP}>:src/physfs_archiver_zip.cpp>
+	$<$<BOOL:${METAPHYSFS_ARCHIVE_SLB}>:src/physfs_archiver_slb.cpp>
+	$<$<BOOL:${METAPHYSFS_ARCHIVE_ISO9660}>:src/physfs_archiver_iso9660.cpp>
+	$<$<BOOL:${METAPHYSFS_ARCHIVE_VDF}>:src/physfs_archiver_vdf.cpp>
     ${PHYSFS_CPP_SRCS}
     ${PHYSFS_M_SRCS}
 )

@@ -31,10 +31,10 @@ char *__PHYSFS_platformCalcBaseDir(const char *argv0)
     @autoreleasepool
     {
         NSString *path = [[NSBundle mainBundle] bundlePath];
-        BAIL_IF(!path, PHYSFS_ERR_OS_ERROR, NULL);
+        BAIL_IF(!path, PHYSFS_ERR_OS_ERROR, nullptr);
         size_t len = [path lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
         char *retval = (char *) allocator.Malloc(len + 2);
-        BAIL_IF(!retval, PHYSFS_ERR_OUT_OF_MEMORY, NULL);
+        BAIL_IF(!retval, PHYSFS_ERR_OUT_OF_MEMORY, nullptr);
         [path getCString:retval maxLength:len+1 encoding:NSUTF8StringEncoding];
         retval[len] = '/';
         retval[len+1] = '\0';
@@ -48,13 +48,13 @@ char *__PHYSFS_platformCalcPrefDir(const char *org, const char *app)
     @autoreleasepool
     {
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, TRUE);
-        BAIL_IF(!paths, PHYSFS_ERR_OS_ERROR, NULL);
+        BAIL_IF(!paths, PHYSFS_ERR_OS_ERROR, nullptr);
         NSString *path = (NSString *) [paths objectAtIndex:0];
-        BAIL_IF(!path, PHYSFS_ERR_OS_ERROR, NULL);
+        BAIL_IF(!path, PHYSFS_ERR_OS_ERROR, nullptr);
         size_t len = [path lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
         const size_t applen = strlen(app);
         char *retval = (char *) allocator.Malloc(len + applen + 3);
-        BAIL_IF(!retval, PHYSFS_ERR_OUT_OF_MEMORY, NULL);
+        BAIL_IF(!retval, PHYSFS_ERR_OUT_OF_MEMORY, nullptr);
         [path getCString:retval maxLength:len+1 encoding:NSUTF8StringEncoding];
         snprintf(retval + len, applen + 3, "/%s/", app);
         return retval;  /* whew. */
@@ -87,8 +87,8 @@ static int darwinIsWholeMedia(io_service_t service)
         
     wholeMedia = IORegistryEntryCreateCFProperty(service,
                                                  CFSTR(kIOMediaWholeKey),
-                                                 NULL, 0);
-    if (wholeMedia == NULL)
+                                                 nullptr, 0);
+    if (wholeMedia == nullptr)
         return 0;
 
     retval = CFBooleanGetValue(wholeMedia);
@@ -106,7 +106,7 @@ static int darwinIsMountedDisc(char *bsdName, mach_port_t mainPort)
     io_iterator_t iter;
     io_service_t service;
 
-    if ((matchingDict = IOBSDNameMatching(mainPort, 0, bsdName)) == NULL)
+    if ((matchingDict = IOBSDNameMatching(mainPort, 0, bsdName)) == nullptr)
         return 0;
 
     rc = IOServiceGetMatchingServices(mainPort, matchingDict, &iter);
@@ -159,14 +159,14 @@ void __PHYSFS_platformDetectAvailableCDs(PHYSFS_StringCallback cb, void *data)
 #if !defined(PHYSFS_NO_CDROM_SUPPORT)
     /* macOS 12.0 changed "master" names to "main". */
     typedef kern_return_t (*ioMainPortFn)(mach_port_t, mach_port_t *);
-    static ioMainPortFn ioMainPort = NULL;
+    static ioMainPortFn ioMainPort = nullptr;
     const char *devPrefix = "/dev/";
     const int prefixLen = strlen(devPrefix);
     mach_port_t mainPort = 0;
     struct statfs *mntbufp;
     int i, mounts;
 
-    if (ioMainPort == NULL)
+    if (ioMainPort == nullptr)
     {
         ioMainPort = (ioMainPortFn) dlsym(RTLD_DEFAULT, "IOMainPort");
         if (!ioMainPort)

@@ -153,7 +153,7 @@ static void szipInitStream(SZIPLookToRead *stream, PHYSFS_Io *io)
 /* Do this in a separate function so we can smallAlloc without looping. */
 static int szipLoadEntry(SZIPinfo *info, const PHYSFS_uint32 idx)
 {
-    const size_t utf16len = SzArEx_GetFileNameUtf16(&info->db, idx, NULL);
+    const size_t utf16len = SzArEx_GetFileNameUtf16(&info->db, idx, nullptr);
     const size_t utf16buflen = utf16len * 2;
     PHYSFS_uint16 *utf16 = (PHYSFS_uint16 *) __PHYSFS_smallAlloc(utf16buflen);
     const size_t utf8buflen = utf16len * 4;
@@ -167,7 +167,7 @@ static int szipLoadEntry(SZIPinfo *info, const PHYSFS_uint32 idx)
         SzArEx_GetFileNameUtf16(&info->db, idx, (UInt16 *) utf16);
         PHYSFS_utf8FromUtf16(utf16, utf8, utf8buflen);
         entry = (SZIPentry*) __PHYSFS_DirTreeAdd(&info->tree, utf8, isdir);
-        retval = (entry != NULL);
+        retval = (entry != nullptr);
         if (retval)
             entry->dbidx = idx;
     } /* if */
@@ -216,20 +216,20 @@ static void *SZIP_openArchive(PHYSFS_Io *io, const char *name,
     static const PHYSFS_uint8 wantedsig[] = { '7','z',0xBC,0xAF,0x27,0x1C };
     SZIPLookToRead stream;
     ISzAlloc *alloc = &SZIP_SzAlloc;
-    SZIPinfo *info = NULL;
+    SZIPinfo *info = nullptr;
     SRes rc;
     PHYSFS_uint8 sig[6];
     PHYSFS_sint64 pos;
 
-    BAIL_IF(forWriting, PHYSFS_ERR_READ_ONLY, NULL);
+    BAIL_IF(forWriting, PHYSFS_ERR_READ_ONLY, nullptr);
     pos = io->tell(io);
-    BAIL_IF_ERRPASS(pos == -1, NULL);
-    BAIL_IF_ERRPASS(io->read(io, sig, 6) != 6, NULL);
+    BAIL_IF_ERRPASS(pos == -1, nullptr);
+    BAIL_IF_ERRPASS(io->read(io, sig, 6) != 6, nullptr);
     *claimed = (memcmp(sig, wantedsig, 6) == 0);
-    BAIL_IF_ERRPASS(!io->seek(io, pos), NULL);
+    BAIL_IF_ERRPASS(!io->seek(io, pos), nullptr);
 
     info = (SZIPinfo *) allocator.Malloc(sizeof (SZIPinfo));
-    BAIL_IF(!info, PHYSFS_ERR_OUT_OF_MEMORY, NULL);
+    BAIL_IF(!info, PHYSFS_ERR_OUT_OF_MEMORY, nullptr);
     memset(info, '\0', sizeof (*info));
 
     SzArEx_Init(&info->db);
@@ -245,9 +245,9 @@ static void *SZIP_openArchive(PHYSFS_Io *io, const char *name,
     return info;
 
 failed:
-    info->io = NULL;  /* don't let cleanup destroy the PHYSFS_Io. */
+    info->io = nullptr;  /* don't let cleanup destroy the PHYSFS_Io. */
     SZIP_closeArchive(info);
-    return NULL;
+    return nullptr;
 } /* SZIP_openArchive */
 
 
@@ -261,18 +261,18 @@ static PHYSFS_Io *SZIP_openRead(void *opaque, const char *path)
     SZIPentry *entry = (SZIPentry *) __PHYSFS_DirTreeFind(&info->tree, path);
     ISzAlloc *alloc = &SZIP_SzAlloc;
     SZIPLookToRead stream;
-    PHYSFS_Io *retval = NULL;
-    PHYSFS_Io *io = NULL;
+    PHYSFS_Io *retval = nullptr;
+    PHYSFS_Io *io = nullptr;
     UInt32 blockIndex = 0xFFFFFFFF;
-    Byte *outBuffer = NULL;
+    Byte *outBuffer = nullptr;
     size_t outBufferSize = 0;
     size_t offset = 0;
     size_t outSizeProcessed = 0;
-    void *buf = NULL;
+    void *buf = nullptr;
     SRes rc;
 
-    BAIL_IF_ERRPASS(!entry, NULL);
-    BAIL_IF(entry->tree.isdir, PHYSFS_ERR_NOT_A_FILE, NULL);
+    BAIL_IF_ERRPASS(!entry, nullptr);
+    BAIL_IF(entry->tree.isdir, PHYSFS_ERR_NOT_A_FILE, nullptr);
 
     io = info->io->duplicate(info->io);
     GOTO_IF_ERRPASS(!io, SZIP_openRead_failed);
@@ -283,19 +283,19 @@ static PHYSFS_Io *SZIP_openRead(void *opaque, const char *path)
                         &blockIndex, &outBuffer, &outBufferSize, &offset,
                         &outSizeProcessed, alloc, alloc);
     GOTO_IF(rc != SZ_OK, szipErrorCode(rc), SZIP_openRead_failed);
-    GOTO_IF(outBuffer == NULL, PHYSFS_ERR_OUT_OF_MEMORY, SZIP_openRead_failed);
+    GOTO_IF(outBuffer == nullptr, PHYSFS_ERR_OUT_OF_MEMORY, SZIP_openRead_failed);
 
     io->destroy(io);
-    io = NULL;
+    io = nullptr;
 
     buf = allocator.Malloc(outSizeProcessed ? outSizeProcessed : 1);
-    GOTO_IF(buf == NULL, PHYSFS_ERR_OUT_OF_MEMORY, SZIP_openRead_failed);
+    GOTO_IF(buf == nullptr, PHYSFS_ERR_OUT_OF_MEMORY, SZIP_openRead_failed);
 
     if (outSizeProcessed > 0)
         memcpy(buf, outBuffer + offset, outSizeProcessed);
 
     alloc->Free(alloc, outBuffer);
-    outBuffer = NULL;
+    outBuffer = nullptr;
 
     retval = __PHYSFS_createMemoryIo(buf, outSizeProcessed, allocator.Free);
     GOTO_IF_ERRPASS(!retval, SZIP_openRead_failed);
@@ -303,7 +303,7 @@ static PHYSFS_Io *SZIP_openRead(void *opaque, const char *path)
     return retval;
 
 SZIP_openRead_failed:
-    if (io != NULL)
+    if (io != nullptr)
         io->destroy(io);
 
     if (buf)
@@ -312,19 +312,19 @@ SZIP_openRead_failed:
     if (outBuffer)
         alloc->Free(alloc, outBuffer);
 
-    return NULL;
+    return nullptr;
 } /* SZIP_openRead */
 
 
 static PHYSFS_Io *SZIP_openWrite(void *opaque, const char *filename)
 {
-    BAIL(PHYSFS_ERR_READ_ONLY, NULL);
+    BAIL(PHYSFS_ERR_READ_ONLY, nullptr);
 } /* SZIP_openWrite */
 
 
 static PHYSFS_Io *SZIP_openAppend(void *opaque, const char *filename)
 {
-    BAIL(PHYSFS_ERR_READ_ONLY, NULL);
+    BAIL(PHYSFS_ERR_READ_ONLY, nullptr);
 } /* SZIP_openAppend */
 
 
@@ -370,16 +370,16 @@ static int SZIP_stat(void *opaque, const char *path, PHYSFS_Stat *stat)
 	    stat->filetype = PHYSFS_FILETYPE_REGULAR;
     } /* else */
 
-    if (info->db.MTime.Vals != NULL)
+    if (info->db.MTime.Vals != nullptr)
 	    stat->modtime = lzmasdkTimeToPhysfsTime(&info->db.MTime.Vals[idx]);
-    else if (info->db.CTime.Vals != NULL)
+    else if (info->db.CTime.Vals != nullptr)
 	    stat->modtime = lzmasdkTimeToPhysfsTime(&info->db.CTime.Vals[idx]);
     else
 	    stat->modtime = -1;
 
-    if (info->db.CTime.Vals != NULL)
+    if (info->db.CTime.Vals != nullptr)
 	    stat->createtime = lzmasdkTimeToPhysfsTime(&info->db.CTime.Vals[idx]);
-    else if (info->db.MTime.Vals != NULL)
+    else if (info->db.MTime.Vals != nullptr)
 	    stat->createtime = lzmasdkTimeToPhysfsTime(&info->db.MTime.Vals[idx]);
     else
 	    stat->createtime = -1;

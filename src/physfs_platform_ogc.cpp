@@ -71,7 +71,7 @@ static inline char *buildSubdirPath(const char *subdir, size_t subdir_length)
     length = strlen(baseDir);
 
     retval = allocator.Malloc(length + subdir_length);
-    BAIL_IF(!retval, PHYSFS_ERR_OUT_OF_MEMORY, NULL);
+    BAIL_IF(!retval, PHYSFS_ERR_OUT_OF_MEMORY, nullptr);
     strcpy(retval, baseDir);
     strcpy(retval + length, subdir);
 
@@ -97,9 +97,9 @@ PHYSFS_EnumerateCallbackResult __PHYSFS_platformEnumerate(const char *dirname,
     PHYSFS_EnumerateCallbackResult retval = PHYSFS_ENUM_OK;
 
     dir = opendir(dirname);
-    BAIL_IF(dir == NULL, errcodeFromErrno(), PHYSFS_ENUM_ERROR);
+    BAIL_IF(dir == nullptr, errcodeFromErrno(), PHYSFS_ENUM_ERROR);
 
-    while ((retval == PHYSFS_ENUM_OK) && ((ent = readdir(dir)) != NULL))
+    while ((retval == PHYSFS_ENUM_OK) && ((ent = readdir(dir)) != nullptr))
     {
         const char *name = ent->d_name;
         if (name[0] == '.')  /* ignore "." and ".." */
@@ -156,7 +156,7 @@ static void *doOpen(const char *filename, int mode)
     do {
         fd = open(filename, mode, S_IRUSR | S_IWUSR);
     } while ((fd < 0) && (errno == EINTR));
-    BAIL_IF(fd < 0, errcodeFromErrno(), NULL);
+    BAIL_IF(fd < 0, errcodeFromErrno(), nullptr);
 
 #if !defined(O_CLOEXEC) && defined(FD_CLOEXEC)
     set_CLOEXEC(fd);
@@ -168,7 +168,7 @@ static void *doOpen(const char *filename, int mode)
         {
             const int err = errno;
             close(fd);
-            BAIL(errcodeFromErrnoError(err), NULL);
+            BAIL(errcodeFromErrnoError(err), nullptr);
         } /* if */
     } /* if */
 
@@ -176,7 +176,7 @@ static void *doOpen(const char *filename, int mode)
     if (!retval)
     {
         close(fd);
-        BAIL(PHYSFS_ERR_OUT_OF_MEMORY, NULL);
+        BAIL(PHYSFS_ERR_OUT_OF_MEMORY, nullptr);
     } /* if */
 
     *retval = fd;
@@ -399,7 +399,7 @@ char *__PHYSFS_platformCalcBaseDir(const char *argv0)
     const size_t bufsize = 128;
 
     retval = allocator.Malloc(bufsize);
-    BAIL_IF(!retval, PHYSFS_ERR_OUT_OF_MEMORY, NULL);
+    BAIL_IF(!retval, PHYSFS_ERR_OUT_OF_MEMORY, nullptr);
 
     if (getcwd(retval, bufsize - 1))
     {

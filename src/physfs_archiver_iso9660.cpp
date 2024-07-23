@@ -116,11 +116,11 @@ static int iso9660AddEntry(PHYSFS_Io *io, const int joliet, const int isdir,
     if ((entry) && (isdir))
     {
         if (!iso9660LoadEntries(io, joliet, fullpath, pos, pos + len, unpkarc))
-            entry = NULL;  /* so we report a failure later. */
+            entry = nullptr;  /* so we report a failure later. */
     } /* if */
 
     __PHYSFS_smallFree(fullpath);
-    return entry != NULL;
+    return entry != nullptr;
 } /* iso9660AddEntry */
 
 static int iso9660LoadEntries(PHYSFS_Io *io, const int joliet,
@@ -335,23 +335,23 @@ static void *ISO9660_openArchive(PHYSFS_Io *io, const char *filename,
     PHYSFS_uint64 rootpos = 0;
     PHYSFS_uint64 len = 0;
     int joliet = 0;
-    void *unpkarc = NULL;
+    void *unpkarc = nullptr;
 
-    assert(io != NULL);  /* shouldn't ever happen. */
+    assert(io != nullptr);  /* shouldn't ever happen. */
 
-    BAIL_IF(forWriting, PHYSFS_ERR_READ_ONLY, NULL);
+    BAIL_IF(forWriting, PHYSFS_ERR_READ_ONLY, nullptr);
 
     if (!parseVolumeDescriptor(io, &rootpos, &len, &joliet, claimed))
-        return NULL;
+        return nullptr;
 
     /* !!! FIXME: check case_sensitive and only_usascii params for this archive. */
     unpkarc = UNPK_openArchive(io, 1, 0);
-    BAIL_IF_ERRPASS(!unpkarc, NULL);
+    BAIL_IF_ERRPASS(!unpkarc, nullptr);
 
     if (!iso9660LoadEntries(io, joliet, "", rootpos, rootpos + len, unpkarc))
     {
         UNPK_abandonArchive(unpkarc);
-        return NULL;
+        return nullptr;
     } /* if */
 
     return unpkarc;

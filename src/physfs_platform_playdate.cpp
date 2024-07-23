@@ -13,7 +13,7 @@
 
 #include "physfs_internal.h"
 
-static PlaydateAPI *playdate = NULL;
+static PlaydateAPI *playdate = nullptr;
 
 /* Playdate interpolates a separate write dir on top of a read-only
    base dir, so put the "user" dir somewhere deeper in the tree
@@ -31,8 +31,8 @@ int __PHYSFS_platformInit(const char *argv0)
     /* as a cheat, we expect argv0 to be a PlaydateAPI* on Playdate. */
     playdate = (PlaydateAPI *) argv0;
 
-    allocator.Init = NULL;
-    allocator.Deinit = NULL;
+    allocator.Init = nullptr;
+    allocator.Deinit = nullptr;
     allocator.Malloc = playdateAllocatorMalloc;
     allocator.Realloc = playdateAllocatorRealloc;
     allocator.Free = playdateAllocatorFree;
@@ -42,7 +42,7 @@ int __PHYSFS_platformInit(const char *argv0)
 
 void __PHYSFS_platformDeinit(void)
 {
-    playdate = NULL;
+    playdate = nullptr;
 }
 
 void __PHYSFS_platformDetectAvailableCDs(PHYSFS_StringCallback cb, void *data)
@@ -64,7 +64,7 @@ char *__PHYSFS_platformCalcPrefDir(const char *org, const char *app)
 {
     const size_t slen = strlen(org) + strlen(app) + strlen(WRITABLE_DIRNAME) + 5;
     char *retval = (char *) allocator.Malloc(slen);
-    BAIL_IF(!retval, PHYSFS_ERR_OUT_OF_MEMORY, NULL);
+    BAIL_IF(!retval, PHYSFS_ERR_OUT_OF_MEMORY, nullptr);
     snprintf(retval, slen, "/" WRITABLE_DIRNAME "/%s/%s/", org, app);
     return retval;
 }
@@ -126,21 +126,21 @@ int __PHYSFS_platformMkDir(const char *filename)
 void *__PHYSFS_platformOpenRead(const char *filename)
 {
     SDFile *sdf = playdate->file->open(filename, kFileRead|kFileReadData);
-    BAIL_IF(!sdf, PHYSFS_ERR_OS_ERROR, NULL);
+    BAIL_IF(!sdf, PHYSFS_ERR_OS_ERROR, nullptr);
     return sdf;
 }
 
 void *__PHYSFS_platformOpenWrite(const char *filename)
 {
     SDFile *sdf = playdate->file->open(filename, kFileWrite);
-    BAIL_IF(!sdf, PHYSFS_ERR_OS_ERROR, NULL);
+    BAIL_IF(!sdf, PHYSFS_ERR_OS_ERROR, nullptr);
     return sdf;
 }
 
 void *__PHYSFS_platformOpenAppend(const char *filename)
 {
     SDFile *sdf = playdate->file->open(filename, kFileAppend);
-    BAIL_IF(!sdf, PHYSFS_ERR_OS_ERROR, NULL);
+    BAIL_IF(!sdf, PHYSFS_ERR_OS_ERROR, nullptr);
     return sdf;
 }
 
@@ -264,13 +264,13 @@ void __PHYSFS_platformReleaseMutex(void *mutex)
 
 static void *playdateAllocatorMalloc(PHYSFS_uint64 s)
 {
-    BAIL_IF(!__PHYSFS_ui64FitsAddressSpace(s), PHYSFS_ERR_OUT_OF_MEMORY, NULL);
-    return playdate->system->realloc(NULL, (size_t) s);
+    BAIL_IF(!__PHYSFS_ui64FitsAddressSpace(s), PHYSFS_ERR_OUT_OF_MEMORY, nullptr);
+    return playdate->system->realloc(nullptr, (size_t) s);
 }
 
 static void *playdateAllocatorRealloc(void *ptr, PHYSFS_uint64 s)
 {
-    BAIL_IF(!__PHYSFS_ui64FitsAddressSpace(s), PHYSFS_ERR_OUT_OF_MEMORY, NULL);
+    BAIL_IF(!__PHYSFS_ui64FitsAddressSpace(s), PHYSFS_ERR_OUT_OF_MEMORY, nullptr);
     return playdate->system->realloc(ptr, (size_t) s);
 }
 

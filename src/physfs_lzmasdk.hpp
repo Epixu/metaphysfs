@@ -391,9 +391,9 @@ static void SzArEx_Init(CSzArEx *p);
 static void SzArEx_Free(CSzArEx *p, ISzAlloc *alloc);
 
 /*
-if dest == NULL, the return value specifies the required size of the buffer,
+if dest == nullptr, the return value specifies the required size of the buffer,
   in 16-bit characters, including the null-terminating character.
-if dest != NULL, the return value specifies the number of 16-bit characters that
+if dest != nullptr, the return value specifies the number of 16-bit characters that
   are written to the dest, including the null-terminating character. */
 
 static size_t SzArEx_GetFileNameUtf16(const CSzArEx *p, size_t fileIndex, UInt16 *dest);
@@ -1718,15 +1718,15 @@ static void LookToRead_Init(CLookToRead *p)
 */
 
 #define MY_ALLOC(T, p, size, alloc) { \
-  if ((p = (T *)IAlloc_Alloc(alloc, (size) * sizeof(T))) == NULL) return SZ_ERROR_MEM; }
+  if ((p = (T *)IAlloc_Alloc(alloc, (size) * sizeof(T))) == nullptr) return SZ_ERROR_MEM; }
 
-#define MY_ALLOC_ZE(T, p, size, alloc) { if ((size) == 0) p = NULL; else MY_ALLOC(T, p, size, alloc) }
+#define MY_ALLOC_ZE(T, p, size, alloc) { if ((size) == 0) p = nullptr; else MY_ALLOC(T, p, size, alloc) }
 
 #define MY_ALLOC_AND_CPY(to, size, from, alloc) \
   { MY_ALLOC(Byte, to, size, alloc); memcpy(to, from, size); }
 
 #define MY_ALLOC_ZE_AND_CPY(to, size, from, alloc) \
-  { if ((size) == 0) p = NULL; else { MY_ALLOC_AND_CPY(to, size, from, alloc) } }
+  { if ((size) == 0) p = nullptr; else { MY_ALLOC_AND_CPY(to, size, from, alloc) } }
 
 #define k7zMajorVersion 0
 
@@ -1765,14 +1765,14 @@ enum EIdEnum
 
 static const Byte k7zSignature[k7zSignatureSize] = {'7', 'z', 0xBC, 0xAF, 0x27, 0x1C};
 
-#define SzBitUi32s_Init(p) { (p)->Defs = NULL; (p)->Vals = NULL; }
+#define SzBitUi32s_Init(p) { (p)->Defs = nullptr; (p)->Vals = nullptr; }
 
 static SRes SzBitUi32s_Alloc(CSzBitUi32s *p, size_t num, ISzAlloc *alloc)
 {
   if (num == 0)
   {
-    p->Defs = NULL;
-    p->Vals = NULL;
+    p->Defs = nullptr;
+    p->Vals = nullptr;
   }
   else
   {
@@ -1784,16 +1784,16 @@ static SRes SzBitUi32s_Alloc(CSzBitUi32s *p, size_t num, ISzAlloc *alloc)
 
 static void SzBitUi32s_Free(CSzBitUi32s *p, ISzAlloc *alloc)
 {
-  IAlloc_Free(alloc, p->Defs); p->Defs = NULL;
-  IAlloc_Free(alloc, p->Vals); p->Vals = NULL;
+  IAlloc_Free(alloc, p->Defs); p->Defs = nullptr;
+  IAlloc_Free(alloc, p->Vals); p->Vals = nullptr;
 }
 
-#define SzBitUi64s_Init(p) { (p)->Defs = NULL; (p)->Vals = NULL; }
+#define SzBitUi64s_Init(p) { (p)->Defs = nullptr; (p)->Vals = nullptr; }
 
 static void SzBitUi64s_Free(CSzBitUi64s *p, ISzAlloc *alloc)
 {
-  IAlloc_Free(alloc, p->Defs); p->Defs = NULL;
-  IAlloc_Free(alloc, p->Vals); p->Vals = NULL;
+  IAlloc_Free(alloc, p->Defs); p->Defs = nullptr;
+  IAlloc_Free(alloc, p->Vals); p->Vals = nullptr;
 }
 
 
@@ -1802,16 +1802,16 @@ static void SzAr_Init(CSzAr *p)
   p->NumPackStreams = 0;
   p->NumFolders = 0;
   
-  p->PackPositions = NULL;
+  p->PackPositions = nullptr;
   SzBitUi32s_Init(&p->FolderCRCs);
 
-  p->FoCodersOffsets = NULL;
-  p->FoStartPackStreamIndex = NULL;
-  p->FoToCoderUnpackSizes = NULL;
-  p->FoToMainUnpackSizeIndex = NULL;
-  p->CoderUnpackSizes = NULL;
+  p->FoCodersOffsets = nullptr;
+  p->FoStartPackStreamIndex = nullptr;
+  p->FoToCoderUnpackSizes = nullptr;
+  p->FoToMainUnpackSizeIndex = nullptr;
+  p->CoderUnpackSizes = nullptr;
 
-  p->CodersData = NULL;
+  p->CodersData = nullptr;
 }
 
 static void SzAr_Free(CSzAr *p, ISzAlloc *alloc)
@@ -1838,14 +1838,14 @@ static void SzArEx_Init(CSzArEx *p)
   p->NumFiles = 0;
   p->dataPos = 0;
   
-  p->UnpackPositions = NULL;
-  p->IsDirs = NULL;
+  p->UnpackPositions = nullptr;
+  p->IsDirs = nullptr;
   
-  p->FolderToFile = NULL;
-  p->FileToFolder = NULL;
+  p->FolderToFile = nullptr;
+  p->FileToFolder = nullptr;
   
-  p->FileNameOffsets = NULL;
-  p->FileNames = NULL;
+  p->FileNameOffsets = nullptr;
+  p->FileNames = nullptr;
   
   SzBitUi32s_Init(&p->CRCs);
   SzBitUi32s_Init(&p->Attribs);
@@ -1885,7 +1885,7 @@ static int TestSignatureCandidate(const Byte *testBytes)
   return 1;
 }
 
-#define SzData_Clear(p) { (p)->Data = NULL; (p)->Size = 0; }
+#define SzData_Clear(p) { (p)->Data = nullptr; (p)->Size = 0; }
 
 #define SZ_READ_BYTE_SD(_sd_, dest) if ((_sd_)->Size == 0) return SZ_ERROR_ARCHIVE; (_sd_)->Size--; dest = *(_sd_)->Data++;
 #define SZ_READ_BYTE(dest) SZ_READ_BYTE_SD(sd, dest)
@@ -2017,7 +2017,7 @@ static MY_NO_INLINE SRes ReadBitVector(CSzData *sd, UInt32 numItems, Byte **v, I
   Byte allAreDefined;
   Byte *v2;
   UInt32 numBytes = (numItems + 7) >> 3;
-  *v = NULL;
+  *v = nullptr;
   SZ_READ_BYTE(allAreDefined);
   if (numBytes == 0)
     return SZ_OK;
@@ -2690,7 +2690,7 @@ static SRes SzReadAndDecodePackedStreams(
   CSubStreamInfo ssi;
   UInt32 numFolders;
 
-  RINOK(SzReadStreamsInfo(p, sd, numFoldersMax, NULL, 0, &dataStartPos, &ssi, allocTemp));
+  RINOK(SzReadStreamsInfo(p, sd, numFoldersMax, nullptr, 0, &dataStartPos, &ssi, allocTemp));
 
   numFolders = p->NumFolders;
   if (numFolders == 0)
@@ -2875,8 +2875,8 @@ static SRes SzReadHeader2(
 {
   UInt32 numFiles = 0;
   UInt32 numEmptyStreams = 0;
-  const Byte *emptyStreams = NULL;
-  const Byte *emptyFiles = NULL;
+  const Byte *emptyStreams = nullptr;
+  const Byte *emptyFiles = nullptr;
   
   RINOK(SzReadNumber32(sd, &numFiles));
   p->NumFiles = numFiles;
@@ -2935,7 +2935,7 @@ static SRes SzReadHeader2(
       {
         RINOK(RememberBitVector(sd, numFiles, &emptyStreams));
         numEmptyStreams = CountDefinedBits(emptyStreams, numFiles);
-        emptyFiles = NULL;
+        emptyFiles = nullptr;
         break;
       }
       case k7zIdEmptyFile:
@@ -3005,8 +3005,8 @@ static SRes SzReadHeader2(
     UInt32 remSubStreams = 0;
     UInt32 numSubStreams = 0;
     UInt64 unpackPos = 0;
-    const Byte *digestsDefs = NULL;
-    const Byte *digestsVals = NULL;
+    const Byte *digestsDefs = nullptr;
+    const Byte *digestsVals = nullptr;
     UInt32 digestsValsIndex = 0;
     UInt32 digestIndex;
     Byte allDigestsDefined = 0;
@@ -3366,12 +3366,12 @@ static SRes SzArEx_Extract(
   {
     IAlloc_Free(allocMain, *tempBuf);
     *blockIndex = folderIndex;
-    *tempBuf = NULL;
+    *tempBuf = nullptr;
     *outBufferSize = 0;
     return SZ_OK;
   }
 
-  if (*tempBuf == NULL || *blockIndex != folderIndex)
+  if (*tempBuf == nullptr || *blockIndex != folderIndex)
   {
     UInt64 unpackSizeSpec = SzAr_GetFolderUnpackSize(&p->db, folderIndex);
     /*
@@ -3385,7 +3385,7 @@ static SRes SzArEx_Extract(
       return SZ_ERROR_MEM;
     *blockIndex = folderIndex;
     IAlloc_Free(allocMain, *tempBuf);
-    *tempBuf = NULL;
+    *tempBuf = nullptr;
     
     if (res == SZ_OK)
     {
@@ -3393,7 +3393,7 @@ static SRes SzArEx_Extract(
       if (unpackSize != 0)
       {
         *tempBuf = (Byte *)IAlloc_Alloc(allocMain, unpackSize);
-        if (*tempBuf == NULL)
+        if (*tempBuf == nullptr)
           res = SZ_ERROR_MEM;
       }
   
@@ -3604,7 +3604,7 @@ static SRes SzDecodePpmd(const Byte *props, unsigned propsSize, UInt64 inSize, I
 
   s.p.Read = ReadByte;
   s.inStream = inStream;
-  s.begin = s.end = s.cur = NULL;
+  s.begin = s.end = s.cur = nullptr;
   s.extra = False;
   s.res = SZ_OK;
   s.processed = 0;
@@ -3670,7 +3670,7 @@ static SRes SzDecodeLzma(const Byte *props, unsigned propsSize, UInt64 inSize, I
 
   for (;;)
   {
-    const void *inBuf = NULL;
+    const void *inBuf = nullptr;
     size_t lookahead = (1 << 18);
     if (lookahead > inSize)
       lookahead = (size_t)inSize;
@@ -3732,7 +3732,7 @@ static SRes SzDecodeLzma2(const Byte *props, unsigned propsSize, UInt64 inSize, 
 
   for (;;)
   {
-    const void *inBuf = NULL;
+    const void *inBuf = nullptr;
     size_t lookahead = (1 << 18);
     if (lookahead > inSize)
       lookahead = (size_t)inSize;
@@ -5660,7 +5660,7 @@ static SRes LzmaDec_DecodeToDic(CLzmaDec *p, SizeT dicLimit, const Byte *src, Si
 static void LzmaDec_FreeProbs(CLzmaDec *p, ISzAlloc *alloc)
 {
   alloc->Free(alloc, p->probs);
-  p->probs = NULL;
+  p->probs = nullptr;
 }
 
 static SRes LzmaProps_Decode(CLzmaProps *p, const Byte *data, unsigned size)

@@ -110,31 +110,31 @@ static void *HOG_openArchive(PHYSFS_Io *io, const char *name,
                              int forWriting, int *claimed)
 {
     PHYSFS_uint8 buf[3];
-    void *unpkarc = NULL;
+    void *unpkarc = nullptr;
     int hog1 = 0;
 
-    assert(io != NULL);  /* shouldn't ever happen. */
-    BAIL_IF(forWriting, PHYSFS_ERR_READ_ONLY, NULL);
-    BAIL_IF_ERRPASS(!__PHYSFS_readAll(io, buf, 3), NULL);
+    assert(io != nullptr);  /* shouldn't ever happen. */
+    BAIL_IF(forWriting, PHYSFS_ERR_READ_ONLY, nullptr);
+    BAIL_IF_ERRPASS(!__PHYSFS_readAll(io, buf, 3), nullptr);
 
     if (memcmp(buf, "DHF", 3) == 0)
         hog1 = 1;  /* original HOG (Descent 1 and 2) archive */
     else
     {
-        BAIL_IF(memcmp(buf, "HOG", 3) != 0, PHYSFS_ERR_UNSUPPORTED, NULL); /* Not HOG2 */
-        BAIL_IF_ERRPASS(!__PHYSFS_readAll(io, buf, 1), NULL);
-        BAIL_IF(buf[0] != '2', PHYSFS_ERR_UNSUPPORTED, NULL); /* Not HOG2 */
+        BAIL_IF(memcmp(buf, "HOG", 3) != 0, PHYSFS_ERR_UNSUPPORTED, nullptr); /* Not HOG2 */
+        BAIL_IF_ERRPASS(!__PHYSFS_readAll(io, buf, 1), nullptr);
+        BAIL_IF(buf[0] != '2', PHYSFS_ERR_UNSUPPORTED, nullptr); /* Not HOG2 */
     } /* else */
 
     *claimed = 1;
 
     unpkarc = UNPK_openArchive(io, 0, 1);
-    BAIL_IF_ERRPASS(!unpkarc, NULL);
+    BAIL_IF_ERRPASS(!unpkarc, nullptr);
 
     if (!(hog1 ? hog1LoadEntries(io, unpkarc) : hog2LoadEntries(io, unpkarc)))
     {
         UNPK_abandonArchive(unpkarc);
-        return NULL;
+        return nullptr;
     } /* if */
 
     return unpkarc;

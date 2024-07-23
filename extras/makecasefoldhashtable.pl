@@ -211,7 +211,7 @@ print("static const CaseFoldHashBucket1_16 case_fold_hash1_16[] = {\n");
 for (my $i = 0; $i < $HASHBUCKETS1_16; $i++) {
     my $str = $foldPairs1_16[$i];
     if ($str eq '') {
-        print("    { NULL, 0 },\n");
+        print("    { nullptr, 0 },\n");
     } else {
         my $num = '000' . $i;
         $num =~ s/\A.*?(\d\d\d)\Z/$1/;
@@ -228,7 +228,7 @@ print("static const CaseFoldHashBucket1_32 case_fold_hash1_32[] = {\n");
 for (my $i = 0; $i < $HASHBUCKETS1_32; $i++) {
     my $str = $foldPairs1_32[$i];
     if ($str eq '') {
-        print("    { NULL, 0 },\n");
+        print("    { nullptr, 0 },\n");
     } else {
         my $num = '000' . $i;
         $num =~ s/\A.*?(\d\d\d)\Z/$1/;
@@ -245,7 +245,7 @@ print("static const CaseFoldHashBucket2_16 case_fold_hash2_16[] = {\n");
 for (my $i = 0; $i < $HASHBUCKETS2_16; $i++) {
     my $str = $foldPairs2_16[$i];
     if ($str eq '') {
-        print("    { NULL, 0 },\n");
+        print("    { nullptr, 0 },\n");
     } else {
         my $num = '000' . $i;
         $num =~ s/\A.*?(\d\d\d)\Z/$1/;
@@ -261,7 +261,7 @@ print("static const CaseFoldHashBucket3_16 case_fold_hash3_16[] = {\n");
 for (my $i = 0; $i < $HASHBUCKETS3_16; $i++) {
     my $str = $foldPairs3_16[$i];
     if ($str eq '') {
-        print("    { NULL, 0 },\n");
+        print("    { nullptr, 0 },\n");
     } else {
         my $num = '000' . $i;
         $num =~ s/\A.*?(\d\d\d)\Z/$1/;

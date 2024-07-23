@@ -33,8 +33,8 @@ void __PHYSFS_platformDeinit(void)
 char *__PHYSFS_platformCalcBaseDir(const char *argv0)
 {
     char *retval = (char *) allocator.Malloc(PATH_MAX+1);
-    if (retval == NULL)
-        BAIL(PHYSFS_ERR_OUT_OF_MEMORY, NULL);
+    if (retval == nullptr)
+        BAIL(PHYSFS_ERR_OUT_OF_MEMORY, nullptr);
     else
     {
         const int fd = open("/proc/self/exefile", O_RDONLY);
@@ -47,21 +47,21 @@ char *__PHYSFS_platformCalcBaseDir(const char *argv0)
         if ((br < 0) || (br > PATH_MAX))
         {
             allocator.Free(retval);
-            BAIL(PHYSFS_ERR_OS_ERROR, NULL);
+            BAIL(PHYSFS_ERR_OS_ERROR, nullptr);
         } /* if */
 
         retval[br] = '\0';
         ptr = strrchr(retval, '/');
-        if (ptr == NULL)  /* uhoh! */
+        if (ptr == nullptr)  /* uhoh! */
         {
             allocator.Free(retval);
-            BAIL(PHYSFS_ERR_OS_ERROR, NULL);
+            BAIL(PHYSFS_ERR_OS_ERROR, nullptr);
         } /* if */
 
         ptr[1] = '\0';  /* chop off filename, leave dirs and '/' */
 
         ptr = (char *) allocator.Realloc(retval, (ptr - retval) + 2);
-        if (ptr != NULL)  /* just shrinking buffer; don't care if it failed. */
+        if (ptr != nullptr)  /* just shrinking buffer; don't care if it failed. */
             retval = ptr;
     } /* else */
 
@@ -73,13 +73,13 @@ char *__PHYSFS_platformCalcPrefDir(const char *org, const char *app)
 {
     /* !!! FIXME: this might be wrong; I don't know if there's a better method
         on QNX, or if it follows XDG specs, etc. */
-    char *retval = NULL;
+    char *retval = nullptr;
     const char *home = __PHYSFS_getUserDir();
     if (home)
     {
         const size_t len = strlen(home) + strlen(app) + 3;
         retval = (char *) allocator.Malloc(len);
-        BAIL_IF(!retval, PHYSFS_ERR_OUT_OF_MEMORY, NULL);
+        BAIL_IF(!retval, PHYSFS_ERR_OUT_OF_MEMORY, nullptr);
         snprintf(retval, len, "%s.%s/", home, app);
     } /* if */
     return retval;
@@ -154,7 +154,7 @@ void __PHYSFS_platformDetectAvailableCDs(PHYSFS_StringCallback cb, void *data)
     if (dirp)
     {
         struct dirent *dent;
-        while ((dent = readdir(dirp)) != NULL)
+        while ((dent = readdir(dirp)) != nullptr)
             checkDevForCD(dent->d_name, cb, data);
         closedir(dirp);
     } /* if */

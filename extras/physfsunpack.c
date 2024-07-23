@@ -27,7 +27,7 @@ static void modTimeToStr(PHYSFS_sint64 modtime, char *modstr, size_t strsize)
 
 static void fail(const char *what, const char *why)
 {
-    if (why == NULL)
+    if (why == nullptr)
         why = PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
     fprintf(stderr, "%s failed: %s\n", what, why);
     failure = 1;
@@ -37,15 +37,15 @@ static void fail(const char *what, const char *why)
 static void dumpFile(const char *fname)
 {
     const int origfailure = failure;
-    PHYSFS_File *out = NULL;
-    PHYSFS_File *in = NULL;
+    PHYSFS_File *out = nullptr;
+    PHYSFS_File *in = nullptr;
 
     failure = 0;
 
-    if ((in = PHYSFS_openRead(fname)) == NULL)
-        fail("\nPHYSFS_openRead", NULL);
-    else if ((out = PHYSFS_openWrite(fname)) == NULL)
-        fail("\nPHYSFS_openWrite", NULL);
+    if ((in = PHYSFS_openRead(fname)) == nullptr)
+        fail("\nPHYSFS_openRead", nullptr);
+    else if ((out = PHYSFS_openWrite(fname)) == nullptr)
+        fail("\nPHYSFS_openWrite", nullptr);
     else
     {
         char modstr[64];
@@ -66,12 +66,12 @@ static void dumpFile(const char *fname)
             static char buf[64 * 1024];
             PHYSFS_sint64 br = PHYSFS_read(in, buf, 1, sizeof (buf));
             if (br == -1)
-                fail("PHYSFS_read", NULL);
+                fail("PHYSFS_read", nullptr);
             else
             {
                 PHYSFS_sint64 bw = PHYSFS_write(out, buf, 1, br);
                 if (bw != br)
-                    fail("PHYSFS_write", NULL);
+                    fail("PHYSFS_write", nullptr);
                 else
                     size -= bw;
             } /* else */
@@ -81,13 +81,13 @@ static void dumpFile(const char *fname)
             fail("PHYSFS_eof", "BUG! eof != PHYSFS_fileLength bytes!");
     } /* else */
 
-    if (in != NULL)
+    if (in != nullptr)
         PHYSFS_close(in);
 
-    if (out != NULL)
+    if (out != nullptr)
     {
         if (!PHYSFS_close(out))
-            fail("PHYSFS_close", NULL);
+            fail("PHYSFS_close", nullptr);
     } /* if */
 
     if (failure)
@@ -102,7 +102,7 @@ static void unpackCallback(void *_depth, const char *origdir, const char *str)
     int depth = *((int *) _depth);
     const int len = strlen(origdir) + strlen(str) + 2;
     char *fname = (char *) malloc(len);
-    if (fname == NULL)
+    if (fname == nullptr)
         fail("malloc", "Out of memory!");
     else
     {
@@ -117,7 +117,7 @@ static void unpackCallback(void *_depth, const char *origdir, const char *str)
             depth++;
             printf("(directory)\n");
             if (!PHYSFS_mkdir(fname))
-                fail("PHYSFS_mkdir", NULL);
+                fail("PHYSFS_mkdir", nullptr);
             else
                 PHYSFS_enumerateFilesCallback(fname, unpackCallback, &depth);
         } /* if */
@@ -161,7 +161,7 @@ int main(int argc, char **argv)
         return 3;
     } /* if */
 
-    if (!PHYSFS_mount(argv[1], NULL, 1))
+    if (!PHYSFS_mount(argv[1], nullptr, 1))
     {
         fprintf(stderr, "PHYSFS_mount('%s') failed: %s\n",
                 argv[1], PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));

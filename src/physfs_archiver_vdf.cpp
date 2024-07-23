@@ -99,42 +99,42 @@ static void *VDF_openArchive(PHYSFS_Io *io, const char *name,
     PHYSFS_uint32 count, timestamp, version, dataSize, rootCatOffset;
     void *unpkarc;
 
-    assert(io != NULL); /* shouldn't ever happen. */
+    assert(io != nullptr); /* shouldn't ever happen. */
 
-    BAIL_IF(forWriting, PHYSFS_ERR_READ_ONLY, NULL);
+    BAIL_IF(forWriting, PHYSFS_ERR_READ_ONLY, nullptr);
 
     /* skip the 256-byte comment field. */
-    BAIL_IF_ERRPASS(!io->seek(io, VDF_COMMENT_LENGTH), NULL);
+    BAIL_IF_ERRPASS(!io->seek(io, VDF_COMMENT_LENGTH), nullptr);
 
-    BAIL_IF_ERRPASS(!__PHYSFS_readAll(io, sig, sizeof (sig)), NULL);
+    BAIL_IF_ERRPASS(!__PHYSFS_readAll(io, sig, sizeof (sig)), nullptr);
 
     if ((memcmp(sig, VDF_SIGNATURE_G1, VDF_SIGNATURE_LENGTH) != 0) &&
         (memcmp(sig, VDF_SIGNATURE_G2, VDF_SIGNATURE_LENGTH) != 0))
     {
-        BAIL(PHYSFS_ERR_UNSUPPORTED, NULL);
+        BAIL(PHYSFS_ERR_UNSUPPORTED, nullptr);
     } /* if */
 
     *claimed = 1;
 
-    BAIL_IF_ERRPASS(!readui32(io, &count), NULL);
-    BAIL_IF_ERRPASS(!__PHYSFS_readAll(io, ignore, 4), NULL);  /* numFiles */
-    BAIL_IF_ERRPASS(!readui32(io, &timestamp), NULL);
-    BAIL_IF_ERRPASS(!readui32(io, &dataSize), NULL);  /* dataSize */
-    BAIL_IF_ERRPASS(!readui32(io, &rootCatOffset), NULL);  /* rootCatOff */
-    BAIL_IF_ERRPASS(!readui32(io, &version), NULL);
+    BAIL_IF_ERRPASS(!readui32(io, &count), nullptr);
+    BAIL_IF_ERRPASS(!__PHYSFS_readAll(io, ignore, 4), nullptr);  /* numFiles */
+    BAIL_IF_ERRPASS(!readui32(io, &timestamp), nullptr);
+    BAIL_IF_ERRPASS(!readui32(io, &dataSize), nullptr);  /* dataSize */
+    BAIL_IF_ERRPASS(!readui32(io, &rootCatOffset), nullptr);  /* rootCatOff */
+    BAIL_IF_ERRPASS(!readui32(io, &version), nullptr);
 
-    BAIL_IF(version != 0x50, PHYSFS_ERR_UNSUPPORTED, NULL);
+    BAIL_IF(version != 0x50, PHYSFS_ERR_UNSUPPORTED, nullptr);
 
-    BAIL_IF_ERRPASS(!io->seek(io, rootCatOffset), NULL);
+    BAIL_IF_ERRPASS(!io->seek(io, rootCatOffset), nullptr);
 
     /* !!! FIXME: check case_sensitive and only_usascii params for this archive. */
     unpkarc = UNPK_openArchive(io, 1, 0);
-    BAIL_IF_ERRPASS(!unpkarc, NULL);
+    BAIL_IF_ERRPASS(!unpkarc, nullptr);
 
     if (!vdfLoadEntries(io, count, vdfDosTimeToEpoch(timestamp), unpkarc))
     {
         UNPK_abandonArchive(unpkarc);
-        return NULL;
+        return nullptr;
     } /* if */
 
     return unpkarc;

@@ -2567,9 +2567,9 @@ static const CaseFoldHashBucket1_16 case_fold_hash1_16[] = {
     { case_fold1_16_120, __PHYSFS_ARRAYLEN(case_fold1_16_120) },
     { case_fold1_16_121, __PHYSFS_ARRAYLEN(case_fold1_16_121) },
     { case_fold1_16_122, __PHYSFS_ARRAYLEN(case_fold1_16_122) },
-    { NULL, 0 },
+    { nullptr, 0 },
     { case_fold1_16_124, __PHYSFS_ARRAYLEN(case_fold1_16_124) },
-    { NULL, 0 },
+    { nullptr, 0 },
     { case_fold1_16_126, __PHYSFS_ARRAYLEN(case_fold1_16_126) },
     { case_fold1_16_127, __PHYSFS_ARRAYLEN(case_fold1_16_127) },
     { case_fold1_16_128, __PHYSFS_ARRAYLEN(case_fold1_16_128) },
@@ -2743,7 +2743,7 @@ static const CaseFoldHashBucket2_16 case_fold_hash2_16[] = {
 static const CaseFoldHashBucket3_16 case_fold_hash3_16[] = {
     { case_fold3_16_000, __PHYSFS_ARRAYLEN(case_fold3_16_000) },
     { case_fold3_16_001, __PHYSFS_ARRAYLEN(case_fold3_16_001) },
-    { NULL, 0 },
+    { nullptr, 0 },
     { case_fold3_16_003, __PHYSFS_ARRAYLEN(case_fold3_16_003) },
 };
 

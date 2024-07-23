@@ -72,34 +72,34 @@ static void *SLB_openArchive(PHYSFS_Io *io, const char *name,
        covers all meaningful cases where we would accidentally accept a non-SLB
        file with this archiver. */
 
-    assert(io != NULL);  /* shouldn't ever happen. */
+    assert(io != nullptr);  /* shouldn't ever happen. */
 
-    BAIL_IF(forWriting, PHYSFS_ERR_READ_ONLY, NULL);
+    BAIL_IF(forWriting, PHYSFS_ERR_READ_ONLY, nullptr);
 
-    BAIL_IF_ERRPASS(!__PHYSFS_readAll(io, &version, sizeof (version)), NULL);
+    BAIL_IF_ERRPASS(!__PHYSFS_readAll(io, &version, sizeof (version)), nullptr);
     version = PHYSFS_swapULE32(version);
-    BAIL_IF(version != 0, PHYSFS_ERR_UNSUPPORTED, NULL);
+    BAIL_IF(version != 0, PHYSFS_ERR_UNSUPPORTED, nullptr);
 
-    BAIL_IF_ERRPASS(!__PHYSFS_readAll(io, &count, sizeof (count)), NULL);
+    BAIL_IF_ERRPASS(!__PHYSFS_readAll(io, &count, sizeof (count)), nullptr);
     count = PHYSFS_swapULE32(count);
-    BAIL_IF(!count, PHYSFS_ERR_UNSUPPORTED, NULL);
+    BAIL_IF(!count, PHYSFS_ERR_UNSUPPORTED, nullptr);
 
     /* offset of the table of contents */
-    BAIL_IF_ERRPASS(!__PHYSFS_readAll(io, &tocPos, sizeof (tocPos)), NULL);
+    BAIL_IF_ERRPASS(!__PHYSFS_readAll(io, &tocPos, sizeof (tocPos)), nullptr);
     tocPos = PHYSFS_swapULE32(tocPos);
-    BAIL_IF(!tocPos, PHYSFS_ERR_UNSUPPORTED, NULL);
+    BAIL_IF(!tocPos, PHYSFS_ERR_UNSUPPORTED, nullptr);
     
     /* seek to the table of contents */
-    BAIL_IF_ERRPASS(!io->seek(io, tocPos), NULL);
+    BAIL_IF_ERRPASS(!io->seek(io, tocPos), nullptr);
 
     /* !!! FIXME: check case_sensitive and only_usascii params for this archive. */
     unpkarc = UNPK_openArchive(io, 1, 0);
-    BAIL_IF_ERRPASS(!unpkarc, NULL);
+    BAIL_IF_ERRPASS(!unpkarc, nullptr);
 
     if (!slbLoadEntries(io, count, unpkarc))
     {
         UNPK_abandonArchive(unpkarc);
-        return NULL;
+        return nullptr;
     } /* if */
 
     *claimed = 1;  /* oh well. */

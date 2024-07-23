@@ -118,7 +118,7 @@ static void feed_file_http(const char *ipstr, int sock, const char *fname)
 {
     PHYSFS_File *in = PHYSFS_openRead(fname);
 
-    if (in == NULL)
+    if (in == nullptr)
     {
         printf("%s: Can't open [%s]: %s.\n", ipstr, fname, lastError());
         writeString(ipstr, sock, txt404, fname);
@@ -180,7 +180,7 @@ static void feed_dirlist_http(const char *ipstr, int sock,
 static void feed_dir_http(const char *ipstr, int sock, const char *dname)
 {
     char **list = PHYSFS_enumerateFiles(dname);
-    if (list == NULL)
+    if (list == nullptr)
     {
         printf("%s: Can't enumerate directory [%s]: %s.\n",
                ipstr, dname, lastError());
@@ -232,7 +232,7 @@ static void *do_http(void *_args)
     {
         *ptr = '\0';
         ptr = strchr(buffer, '\r');
-        if (ptr != NULL)
+        if (ptr != nullptr)
             *ptr = '\0';
 
         if ((toupper(buffer[0]) == 'G') &&
@@ -242,7 +242,7 @@ static void *do_http(void *_args)
             (toupper(buffer[4]) == '/'))
         {
             ptr = strchr(buffer + 5, ' ');
-            if (ptr != NULL)
+            if (ptr != nullptr)
                 *ptr = '\0';
             feed_http_request(ipstr, args->sock, buffer + 4);
         } /* if */
@@ -253,7 +253,7 @@ static void *do_http(void *_args)
     close(args->sock);
     free(args->addr);
     free(args);
-    return NULL;
+    return nullptr;
 } /* do_http */
 
 
@@ -261,13 +261,13 @@ static void serve_http_request(int sock, struct sockaddr *addr,
                                socklen_t addrlen)
 {
     http_args *args = (http_args *) malloc(sizeof (http_args));
-    if (args == NULL)
+    if (args == nullptr)
     {
         printf("out of memory.\n");
         return;
     } /* if */
     args->addr = (struct sockaddr *) malloc(addrlen);
-    if (args->addr == NULL)
+    if (args->addr == nullptr)
     {
         free(args);
         printf("out of memory.\n");
@@ -292,7 +292,7 @@ static int create_listen_socket(short portnum)
     struct protoent *prot;
     setprotoent(0);
     prot = getprotobyname("tcp");
-    if (prot != NULL)
+    if (prot != nullptr)
         protocol = prot->p_proto;
 #endif
 
@@ -337,8 +337,8 @@ int main(int argc, char **argv)
     int i;
     int portnum = DEFAULT_PORTNUM;
 
-    setbuf(stdout, NULL);
-    setbuf(stderr, NULL);
+    setbuf(stdout, nullptr);
+    setbuf(stderr, nullptr);
 
 #ifndef LACKING_SIGNALS
     /* I'm not sure if this qualifies as a cheap trick... */
@@ -367,7 +367,7 @@ int main(int argc, char **argv)
 
     for (i = 1; i < argc; i++)
     {
-        if (!PHYSFS_mount(argv[i], NULL, 1))
+        if (!PHYSFS_mount(argv[i], nullptr, 1))
             printf(" WARNING: failed to add [%s] to search path.\n", argv[i]);
     } /* else */
 

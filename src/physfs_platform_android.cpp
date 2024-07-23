@@ -13,7 +13,7 @@
 #include <android/log.h>
 #include "physfs_internal.h"
 
-static char *prefpath = NULL;
+static char *prefpath = nullptr;
 
 
 int __PHYSFS_platformInit(const char *argv0)
@@ -27,7 +27,7 @@ void __PHYSFS_platformDeinit(void)
     if (prefpath)
     {
         allocator.Free(prefpath);
-        prefpath = NULL;
+        prefpath = nullptr;
     } /* if */
 } /* __PHYSFS_platformDeinit */
 
@@ -42,11 +42,11 @@ char *__PHYSFS_platformCalcBaseDir(const char *argv0)
 {
     /* as a cheat, we expect argv0 to be a PHYSFS_AndroidInit* on Android. */
     PHYSFS_AndroidInit *ainit = (PHYSFS_AndroidInit *) argv0;
-    char *retval = NULL;
-    JNIEnv *jenv = NULL;
+    char *retval = nullptr;
+    JNIEnv *jenv = nullptr;
     jobject jcontext;
 
-    if (ainit == NULL)
+    if (ainit == nullptr)
         return __PHYSFS_strdup("/");  /* oh well. */
 
     jenv = (JNIEnv *) ainit->jnienv;
@@ -62,11 +62,11 @@ char *__PHYSFS_platformCalcBaseDir(const char *argv0)
         jmeth = (*jenv)->GetMethodID(jenv, (*jenv)->GetObjectClass(jenv, jcontext), "getPackageResourcePath", "()Ljava/lang/String;");
         jstr = (jstring)(*jenv)->CallObjectMethod(jenv, jcontext, jmeth);
         jexception = (*jenv)->ExceptionOccurred(jenv);  /* this can't throw an exception, right? Just in case. */
-        if (jexception != NULL)
+        if (jexception != nullptr)
             (*jenv)->ExceptionClear(jenv);
         else
         {
-            const char *path = (*jenv)->GetStringUTFChars(jenv, jstr, NULL);
+            const char *path = (*jenv)->GetStringUTFChars(jenv, jstr, nullptr);
             retval = __PHYSFS_strdup(path);
             (*jenv)->ReleaseStringUTFChars(jenv, jstr, path);
         } /* else */
@@ -80,11 +80,11 @@ char *__PHYSFS_platformCalcBaseDir(const char *argv0)
             jmeth = (*jenv)->GetMethodID(jenv, (*jenv)->GetObjectClass(jenv, jfileobj), "getCanonicalPath", "()Ljava/lang/String;");
             jstr = (jstring)(*jenv)->CallObjectMethod(jenv, jfileobj, jmeth);
             jexception = (*jenv)->ExceptionOccurred(jenv);
-            if (jexception != NULL)
+            if (jexception != nullptr)
                 (*jenv)->ExceptionClear(jenv);
             else
             {
-                const char *path = (*jenv)->GetStringUTFChars(jenv, jstr, NULL);
+                const char *path = (*jenv)->GetStringUTFChars(jenv, jstr, nullptr);
                 const size_t len = strlen(path) + 2;
                 prefpath = allocator.Malloc(len);
                 if (prefpath)
@@ -93,11 +93,11 @@ char *__PHYSFS_platformCalcBaseDir(const char *argv0)
             } /* else */
         } /* if */
 
-        (*jenv)->PopLocalFrame(jenv, NULL);
+        (*jenv)->PopLocalFrame(jenv, nullptr);
     } /* if */
 
-    /* we can't return NULL because then PhysicsFS will treat argv0 as a string, but it's a non-NULL jobject! */
-    if (retval == NULL)
+    /* we can't return nullptr because then PhysicsFS will treat argv0 as a string, but it's a non-nullptr jobject! */
+    if (retval == nullptr)
         retval = __PHYSFS_strdup("/");   /* we pray this works. */
 
     return retval;

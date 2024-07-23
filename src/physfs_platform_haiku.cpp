@@ -56,8 +56,8 @@ static char *getMountPoint(const char *devname, char *buf, size_t bufsize)
             if ( (vol.GetRootDirectory(&directory) < B_OK) ||
                  (directory.GetEntry(&entry) < B_OK) ||
                  (entry.GetPath(&path) < B_OK) ||
-                 ( (str = path.Path()) == NULL) )
-                return NULL;
+                 ( (str = path.Path()) == nullptr) )
+                return nullptr;
 
             strncpy(buf, str, bufsize-1);
             buf[bufsize-1] = '\0';
@@ -65,7 +65,7 @@ static char *getMountPoint(const char *devname, char *buf, size_t bufsize)
         } /* if */
     } /* while */
 
-    return NULL;
+    return nullptr;
 } /* getMountPoint */
 
 
@@ -132,7 +132,7 @@ void __PHYSFS_platformDetectAvailableCDs(PHYSFS_StringCallback cb, void *data)
 static team_id getTeamID(void)
 {
     thread_info info;
-    thread_id tid = find_thread(NULL);
+    thread_id tid = find_thread(nullptr);
     get_thread_info(tid, &info);
     return info.team;
 } /* getTeamID */
@@ -156,10 +156,10 @@ char *__PHYSFS_platformCalcBaseDir(const char *argv0)
     rc = path.GetParent(&path); /* chop filename, keep directory. */
     assert(rc == B_OK);
     const char *str = path.Path();
-    assert(str != NULL);
+    assert(str != nullptr);
     const size_t len = strlen(str);
     char *retval = (char *) allocator.Malloc(len + 2);
-    BAIL_IF(!retval, PHYSFS_ERR_OUT_OF_MEMORY, NULL);
+    BAIL_IF(!retval, PHYSFS_ERR_OUT_OF_MEMORY, nullptr);
     strcpy(retval, str);
     retval[len] = '/';
     retval[len+1] = '\0';
@@ -173,7 +173,7 @@ char *__PHYSFS_platformCalcPrefDir(const char *org, const char *app)
     const char *append = "config/settings/";
     const size_t len = strlen(userdir) + strlen(append) + strlen(app) + 2;
     char *retval = (char *) allocator.Malloc(len);
-    BAIL_IF(!retval, PHYSFS_ERR_OUT_OF_MEMORY, NULL);
+    BAIL_IF(!retval, PHYSFS_ERR_OUT_OF_MEMORY, nullptr);
     snprintf(retval, len, "%s%s%s/", userdir, append, app);
     return retval;
 } /* __PHYSFS_platformCalcPrefDir */

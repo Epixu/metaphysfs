@@ -136,7 +136,7 @@ static char * MY_GETS(char * const str, const int size,
       c != '\n');
   str[i] = '\0';
   if (i == 0) {
-    return NULL;
+    return nullptr;
   }
   return str;
 }

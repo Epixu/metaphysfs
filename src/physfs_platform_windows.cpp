@@ -56,12 +56,12 @@
 
 
 #define UTF8_TO_UNICODE_STACK(w_assignto, str) { \
-    if (str == NULL) \
-        w_assignto = NULL; \
+    if (str == nullptr) \
+        w_assignto = nullptr; \
     else { \
         const size_t len = (PHYSFS_uint64) ((strlen(str) + 1) * 2); \
         w_assignto = (WCHAR *) __PHYSFS_smallAlloc(len); \
-        if (w_assignto != NULL) \
+        if (w_assignto != nullptr) \
             PHYSFS_utf8ToUtf16(str, (PHYSFS_uint16 *) w_assignto, len); \
     } \
 } \
@@ -77,16 +77,16 @@ static PHYSFS_uint64 wStrLen(const WCHAR *wstr)
 
 static char *unicodeToUtf8Heap(const WCHAR *w_str)
 {
-    char *retval = NULL;
-    if (w_str != NULL)
+    char *retval = nullptr;
+    if (w_str != nullptr)
     {
-        void *ptr = NULL;
+        void *ptr = nullptr;
         const PHYSFS_uint64 len = (wStrLen(w_str) * 4) + 1;
         retval = allocator.Malloc(len);
-        BAIL_IF(!retval, PHYSFS_ERR_OUT_OF_MEMORY, NULL);
+        BAIL_IF(!retval, PHYSFS_ERR_OUT_OF_MEMORY, nullptr);
         PHYSFS_utf8FromUtf16((const PHYSFS_uint16 *) w_str, retval, len);
         ptr = allocator.Realloc(retval, strlen(retval) + 1); /* shrink. */
-        if (ptr != NULL)
+        if (ptr != nullptr)
             retval = (char *) ptr;
     } /* if */
     return retval;
@@ -101,7 +101,7 @@ static inline HANDLE winFindFirstFileW(const WCHAR *path, LPWIN32_FIND_DATAW d)
 {
     #if defined(PHYSFS_PLATFORM_WINRT) || (_WIN32_WINNT >= 0x0501) // Windows XP+
     return FindFirstFileExW(path, FindExInfoStandard, d,
-                            FindExSearchNameMatch, NULL, 0);
+                            FindExSearchNameMatch, nullptr, 0);
     #else
     return FindFirstFileW(path, d);
     #endif
@@ -122,10 +122,10 @@ static inline HANDLE winCreateFileW(const WCHAR *wfname, const DWORD mode,
 {
     const DWORD share = FILE_SHARE_READ | FILE_SHARE_WRITE;
     #if defined(PHYSFS_PLATFORM_WINRT) // also available if targeting Windows 8+ || (_WIN32_WINNT >= 0x0602) - but do not include this for now, due to common toolchain defaults
-    return CreateFile2(wfname, mode, share, creation, NULL);
+    return CreateFile2(wfname, mode, share, creation, nullptr);
     #else
-    return CreateFileW(wfname, mode, share, NULL, creation,
-                       FILE_ATTRIBUTE_NORMAL, NULL);
+    return CreateFileW(wfname, mode, share, nullptr, creation,
+                       FILE_ATTRIBUTE_NORMAL, nullptr);
     #endif
 } /* winCreateFileW */
 
@@ -230,8 +230,8 @@ static inline PHYSFS_ErrorCode errcodeFromWinApi(void)
 #define detectAvailableCDs(cb, data)
 #define deinitCDThread()
 #else
-static HANDLE detectCDThreadHandle = NULL;
-static HWND detectCDHwnd = NULL;
+static HANDLE detectCDThreadHandle = nullptr;
+static HWND detectCDHwnd = nullptr;
 static volatile DWORD drivesWithMediaBitmap = 0;
 
 typedef BOOL (WINAPI *fnSTEM)(DWORD, LPDWORD b);
@@ -240,7 +240,7 @@ static DWORD pollDiscDrives(void)
 {
     /* Try to use SetThreadErrorMode(), which showed up in Windows 7. */
     HANDLE lib = LoadLibraryA("kernel32.dll");
-    fnSTEM stem = NULL;
+    fnSTEM stem = nullptr;
     char drive[4] = { 'x', ':', '\\', '\0' };
     DWORD oldErrorMode = 0;
     DWORD drives = 0;
@@ -263,12 +263,12 @@ static DWORD pollDiscDrives(void)
             continue;
 
         /* If this function succeeds, there's media in the drive */
-        if (GetVolumeInformationA(drive, NULL, 0, NULL, NULL, &tmp, NULL, 0))
+        if (GetVolumeInformationA(drive, nullptr, 0, nullptr, nullptr, &tmp, nullptr, 0))
             drives |= (1 << (i - 'A'));
     } /* for */
 
     if (stem)
-        stem(oldErrorMode, NULL);
+        stem(oldErrorMode, nullptr);
     else
         SetErrorMode(oldErrorMode);
 
@@ -310,7 +310,7 @@ static DWORD WINAPI detectCDThread(LPVOID arg)
     HANDLE initialDiscDetectionComplete = *((HANDLE *) arg);
     const char *classname = "PhysicsFSDetectCDCatcher";
     const char *winname = "PhysicsFSDetectCDMsgWindow";
-    HINSTANCE hInstance = GetModuleHandleW(NULL);
+    HINSTANCE hInstance = GetModuleHandleW(nullptr);
     ATOM class_atom = 0;
     WNDCLASSEXA wce;
     MSG msg;
@@ -329,9 +329,9 @@ static DWORD WINAPI detectCDThread(LPVOID arg)
 
     detectCDHwnd = CreateWindowExA(0, classname, winname, WS_OVERLAPPEDWINDOW,
                         CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-                        CW_USEDEFAULT, HWND_DESKTOP, NULL, hInstance, NULL);
+                        CW_USEDEFAULT, HWND_DESKTOP, nullptr, hInstance, nullptr);
 
-    if (detectCDHwnd == NULL)
+    if (detectCDHwnd == nullptr)
     {
         SetEvent(initialDiscDetectionComplete);  /* let main thread go on. */
         UnregisterClassA(classname, hInstance);
@@ -375,12 +375,12 @@ static void detectAvailableCDs(PHYSFS_StringCallback cb, void *data)
      */
     if (!detectCDThreadHandle)
     {
-        HANDLE initialDetectDone = CreateEvent(NULL, TRUE, FALSE, NULL);
+        HANDLE initialDetectDone = CreateEvent(nullptr, TRUE, FALSE, nullptr);
         if (!initialDetectDone)
             return;  /* oh well. */
 
-        detectCDThreadHandle = CreateThread(NULL, 0, detectCDThread,
-                                            &initialDetectDone, 0, NULL);
+        detectCDThreadHandle = CreateThread(nullptr, 0, detectCDThread,
+                                            &initialDetectDone, 0, nullptr);
         if (detectCDThreadHandle)
             WaitForSingleObject(initialDetectDone, INFINITE);
         CloseHandle(initialDetectDone);
@@ -407,7 +407,7 @@ static void deinitCDThread(void)
         if (detectCDHwnd)
             PostMessageW(detectCDHwnd, WM_QUIT, 0, 0);
         CloseHandle(detectCDThreadHandle);
-        detectCDThreadHandle = NULL;
+        detectCDThreadHandle = nullptr;
         drivesWithMediaBitmap = 0;
     } /* if */
 } /* deinitCDThread */
@@ -425,15 +425,15 @@ static char *calcDirAppendSep(const WCHAR *wdir)
     size_t len;
     void *ptr;
     char *retval;
-    BAIL_IF(!wdir, errcodeFromWinApi(), NULL);
+    BAIL_IF(!wdir, errcodeFromWinApi(), nullptr);
     retval = unicodeToUtf8Heap(wdir);
-    BAIL_IF_ERRPASS(!retval, NULL);
+    BAIL_IF_ERRPASS(!retval, nullptr);
     len = strlen(retval);
     ptr = allocator.Realloc(retval, len + 2);
     if (!ptr)
     {
         allocator.Free(retval);
-        BAIL(PHYSFS_ERR_OUT_OF_MEMORY, NULL);
+        BAIL(PHYSFS_ERR_OUT_OF_MEMORY, nullptr);
     } /* if */
     retval = (char *) ptr;
     retval[len] = '\\';
@@ -447,27 +447,27 @@ char *__PHYSFS_platformCalcBaseDir(const char *argv0)
 #ifdef PHYSFS_PLATFORM_WINRT
     return calcDirAppendSep((const WCHAR *) __PHYSFS_winrtCalcBaseDir());
 #else
-    char *retval = NULL;
+    char *retval = nullptr;
     DWORD buflen = 64;
-    LPWSTR modpath = NULL;
+    LPWSTR modpath = nullptr;
 
     while (1)
     {
         DWORD rc;
         void *ptr;
 
-        if ( (ptr = allocator.Realloc(modpath, buflen*sizeof(WCHAR))) == NULL )
+        if ( (ptr = allocator.Realloc(modpath, buflen*sizeof(WCHAR))) == nullptr )
         {
             allocator.Free(modpath);
-            BAIL(PHYSFS_ERR_OUT_OF_MEMORY, NULL);
+            BAIL(PHYSFS_ERR_OUT_OF_MEMORY, nullptr);
         } /* if */
         modpath = (LPWSTR) ptr;
 
-        rc = GetModuleFileNameW(NULL, modpath, buflen);
+        rc = GetModuleFileNameW(nullptr, modpath, buflen);
         if (rc == 0)
         {
             allocator.Free(modpath);
-            BAIL(errcodeFromWinApi(), NULL);
+            BAIL(errcodeFromWinApi(), nullptr);
         } /* if */
 
         if (rc < buflen)
@@ -514,26 +514,26 @@ char *__PHYSFS_platformCalcPrefDir(const char *org, const char *app)
      *  and apparently just wraps the new API. This is the new way to do it:
      *
      *     SHGetKnownFolderPath(FOLDERID_RoamingAppData, KF_FLAG_CREATE,
-     *                          NULL, &wszPath);
+     *                          nullptr, &wszPath);
      */
 
     WCHAR path[MAX_PATH];
-    char *utf8 = NULL;
+    char *utf8 = nullptr;
     size_t len = 0;
-    char *retval = NULL;
+    char *retval = nullptr;
 
-    if (!SUCCEEDED(SHGetFolderPathW(NULL, CSIDL_APPDATA | CSIDL_FLAG_CREATE,
-                                   NULL, 0, path)))
-        BAIL(PHYSFS_ERR_OS_ERROR, NULL);
+    if (!SUCCEEDED(SHGetFolderPathW(nullptr, CSIDL_APPDATA | CSIDL_FLAG_CREATE,
+                                   nullptr, 0, path)))
+        BAIL(PHYSFS_ERR_OS_ERROR, nullptr);
 
     utf8 = unicodeToUtf8Heap(path);
-    BAIL_IF_ERRPASS(!utf8, NULL);
+    BAIL_IF_ERRPASS(!utf8, nullptr);
     len = strlen(utf8) + strlen(org) + strlen(app) + 4;
     retval = allocator.Malloc(len);
     if (!retval)
     {
         allocator.Free(utf8);
-        BAIL(PHYSFS_ERR_OUT_OF_MEMORY, NULL);
+        BAIL(PHYSFS_ERR_OUT_OF_MEMORY, nullptr);
     } /* if */
 
     snprintf(retval, len, "%s\\%s\\%s\\", utf8, org, app);
@@ -549,13 +549,13 @@ char *__PHYSFS_platformCalcUserDir(void)
     return calcDirAppendSep((const WCHAR *) __PHYSFS_winrtCalcPrefDir());
 #else
     typedef BOOL (WINAPI *fnGetUserProfDirW)(HANDLE, LPWSTR, LPDWORD);
-    fnGetUserProfDirW pGetDir = NULL;
-    HANDLE lib = NULL;
-    HANDLE accessToken = NULL;       /* Security handle to process */
-    char *retval = NULL;
+    fnGetUserProfDirW pGetDir = nullptr;
+    HANDLE lib = nullptr;
+    HANDLE accessToken = nullptr;       /* Security handle to process */
+    char *retval = nullptr;
 
     lib = LoadLibraryA("userenv.dll");
-    BAIL_IF(!lib, errcodeFromWinApi(), NULL);
+    BAIL_IF(!lib, errcodeFromWinApi(), nullptr);
     pGetDir=(fnGetUserProfDirW) GetProcAddress(lib,"GetUserProfileDirectoryW");
     GOTO_IF(!pGetDir, errcodeFromWinApi(), done);
 
@@ -564,16 +564,16 @@ char *__PHYSFS_platformCalcUserDir(void)
     else
     {
         DWORD psize = 0;
-        LPWSTR wstr = NULL;
+        LPWSTR wstr = nullptr;
         BOOL rc = 0;
 
         /*
          * Should fail. Will write the size of the profile path in
          *  psize. Also note that the second parameter can't be
-         *  NULL or the function fails on Windows XP, but has to be NULL on
+         *  nullptr or the function fails on Windows XP, but has to be nullptr on
          *  Windows 10 or it will fail.  :(
          */
-        rc = pGetDir(accessToken, NULL, &psize);
+        rc = pGetDir(accessToken, nullptr, &psize);
         GOTO_IF(rc, PHYSFS_ERR_OS_ERROR, done);  /* should have failed! */
 
         if (psize == 0)  /* probably on Windows XP, try a different way. */
@@ -586,7 +586,7 @@ char *__PHYSFS_platformCalcUserDir(void)
 
         /* Allocate memory for the profile directory */
         wstr = (LPWSTR) __PHYSFS_smallAlloc((psize + 1) * sizeof (WCHAR));
-        if (wstr != NULL)
+        if (wstr != nullptr)
         {
             if (pGetDir(accessToken, wstr, &psize))
             {
@@ -637,10 +637,10 @@ PHYSFS_EnumerateCallbackResult __PHYSFS_platformEnumerate(const char *dirname,
     HANDLE dir = INVALID_HANDLE_VALUE;
     WIN32_FIND_DATAW entw;
     size_t len = strlen(dirname);
-    char *searchPath = NULL;
-    WCHAR *wSearchPath = NULL;
+    char *searchPath = nullptr;
+    WCHAR *wSearchPath = nullptr;
 
-    /* Allocate a new string for path, maybe '\\', "*", and NULL terminator */
+    /* Allocate a new string for path, maybe '\\', "*", and nullptr terminator */
     searchPath = (char *) __PHYSFS_smallAlloc(len + 3);
     BAIL_IF(!searchPath, PHYSFS_ERR_OUT_OF_MEMORY, PHYSFS_ENUM_ERROR);
 
@@ -677,7 +677,7 @@ PHYSFS_EnumerateCallbackResult __PHYSFS_platformEnumerate(const char *dirname,
         } /* if */
 
         utf8 = unicodeToUtf8Heap(fn);
-        if (utf8 == NULL)
+        if (utf8 == nullptr)
             retval = -1;
         else
         {
@@ -699,7 +699,7 @@ int __PHYSFS_platformMkDir(const char *path)
     WCHAR *wpath;
     DWORD rc;
     UTF8_TO_UNICODE_STACK(wpath, path);
-    rc = CreateDirectoryW(wpath, NULL);
+    rc = CreateDirectoryW(wpath, nullptr);
     __PHYSFS_smallFree(wpath);
     BAIL_IF(rc == 0, errcodeFromWinApi(), 0);
     return 1;
@@ -712,7 +712,7 @@ static HANDLE doOpen(const char *fname, DWORD mode, DWORD creation)
     WCHAR *wfname;
 
     UTF8_TO_UNICODE_STACK(wfname, fname);
-    BAIL_IF(!wfname, PHYSFS_ERR_OUT_OF_MEMORY, NULL);
+    BAIL_IF(!wfname, PHYSFS_ERR_OUT_OF_MEMORY, nullptr);
 
     fileh = winCreateFileW(wfname, mode, creation);
     __PHYSFS_smallFree(wfname);
@@ -727,27 +727,27 @@ static HANDLE doOpen(const char *fname, DWORD mode, DWORD creation)
 void *__PHYSFS_platformOpenRead(const char *filename)
 {
     HANDLE h = doOpen(filename, GENERIC_READ, OPEN_EXISTING);
-    return (h == INVALID_HANDLE_VALUE) ? NULL : (void *) h;
+    return (h == INVALID_HANDLE_VALUE) ? nullptr : (void *) h;
 } /* __PHYSFS_platformOpenRead */
 
 
 void *__PHYSFS_platformOpenWrite(const char *filename)
 {
     HANDLE h = doOpen(filename, GENERIC_WRITE, CREATE_ALWAYS);
-    return (h == INVALID_HANDLE_VALUE) ? NULL : (void *) h;
+    return (h == INVALID_HANDLE_VALUE) ? nullptr : (void *) h;
 } /* __PHYSFS_platformOpenWrite */
 
 
 void *__PHYSFS_platformOpenAppend(const char *filename)
 {
     HANDLE h = doOpen(filename, GENERIC_WRITE, OPEN_ALWAYS);
-    BAIL_IF_ERRPASS(h == INVALID_HANDLE_VALUE, NULL);
+    BAIL_IF_ERRPASS(h == INVALID_HANDLE_VALUE, nullptr);
 
-    if (!winSetFilePointer(h, 0, NULL, FILE_END))
+    if (!winSetFilePointer(h, 0, nullptr, FILE_END))
     {
         const PHYSFS_ErrorCode err = errcodeFromWinApi();
         CloseHandle(h);
-        BAIL(err, NULL);
+        BAIL(err, nullptr);
     } /* if */
 
     return (void *) h;
@@ -766,7 +766,7 @@ PHYSFS_sint64 __PHYSFS_platformRead(void *opaque, void *buf, PHYSFS_uint64 len)
     {
         const DWORD thislen = (len > 0xFFFFFFFF) ? 0xFFFFFFFF : (DWORD) len;
         DWORD numRead = 0;
-        if (!ReadFile(h, buf, thislen, &numRead, NULL))
+        if (!ReadFile(h, buf, thislen, &numRead, nullptr))
             BAIL(errcodeFromWinApi(), -1);
         len -= (PHYSFS_uint64) numRead;
         totalRead += (PHYSFS_sint64) numRead;
@@ -791,7 +791,7 @@ PHYSFS_sint64 __PHYSFS_platformWrite(void *opaque, const void *buffer,
     {
         const DWORD thislen = (len > 0xFFFFFFFF) ? 0xFFFFFFFF : (DWORD) len;
         DWORD numWritten = 0;
-        if (!WriteFile(h, buffer, thislen, &numWritten, NULL))
+        if (!WriteFile(h, buffer, thislen, &numWritten, nullptr))
             BAIL(errcodeFromWinApi(), -1);
         len -= (PHYSFS_uint64) numWritten;
         totalWritten += (PHYSFS_sint64) numWritten;
@@ -807,7 +807,7 @@ int __PHYSFS_platformSeek(void *opaque, PHYSFS_uint64 pos)
 {
     HANDLE h = (HANDLE) opaque;
     const PHYSFS_sint64 spos = (PHYSFS_sint64) pos;
-    BAIL_IF(!winSetFilePointer(h,spos,NULL,FILE_BEGIN), errcodeFromWinApi(), 0);
+    BAIL_IF(!winSetFilePointer(h,spos,nullptr,FILE_BEGIN), errcodeFromWinApi(), 0);
     return 1;  /* No error occured */
 } /* __PHYSFS_platformSeek */
 
@@ -863,7 +863,7 @@ static int doPlatformDelete(LPWSTR wpath)
 int __PHYSFS_platformDelete(const char *path)
 {
     int retval = 0;
-    LPWSTR wpath = NULL;
+    LPWSTR wpath = nullptr;
     UTF8_TO_UNICODE_STACK(wpath, path);
     BAIL_IF(!wpath, PHYSFS_ERR_OUT_OF_MEMORY, 0);
     retval = doPlatformDelete(wpath);
@@ -876,12 +876,12 @@ void *__PHYSFS_platformCreateMutex(void)
 {
     LPCRITICAL_SECTION lpcs;
     lpcs = (LPCRITICAL_SECTION) allocator.Malloc(sizeof (CRITICAL_SECTION));
-    BAIL_IF(!lpcs, PHYSFS_ERR_OUT_OF_MEMORY, NULL);
+    BAIL_IF(!lpcs, PHYSFS_ERR_OUT_OF_MEMORY, nullptr);
 
     if (!winInitializeCriticalSection(lpcs))
     {
         allocator.Free(lpcs);
-        BAIL(errcodeFromWinApi(), NULL);
+        BAIL(errcodeFromWinApi(), nullptr);
     } /* if */
 
     return lpcs;
@@ -969,7 +969,7 @@ static int isSymlink(const WCHAR *wpath, const DWORD attr)
 int __PHYSFS_platformStat(const char *filename, PHYSFS_Stat *st, const int follow)
 {
     WIN32_FILE_ATTRIBUTE_DATA winstat;
-    WCHAR *wstr = NULL;
+    WCHAR *wstr = nullptr;
     DWORD err = 0;
     BOOL rc = 0;
     int issymlink = 0;

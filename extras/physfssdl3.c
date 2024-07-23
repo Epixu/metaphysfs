@@ -109,8 +109,8 @@ static int SDLCALL physfsiostream_close(void *userdata)
 
 static SDL_IOStream *create_iostream(PHYSFS_File *handle)
 {
-    SDL_IOStream *retval = NULL;
-    if (handle == NULL) {
+    SDL_IOStream *retval = nullptr;
+    if (handle == nullptr) {
         SDL_SetError("PhysicsFS error: %s", PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
     } else {
         SDL_IOStreamInterface iface;
@@ -127,9 +127,9 @@ static SDL_IOStream *create_iostream(PHYSFS_File *handle)
 
 SDL_IOStream *PHYSFSSDL3_makeIOStream(PHYSFS_File *handle)
 {
-    SDL_IOStream *retval = NULL;
-    if (handle == NULL) {
-        SDL_SetError("NULL pointer passed to PHYSFSSDL3_makeRWops().");
+    SDL_IOStream *retval = nullptr;
+    if (handle == nullptr) {
+        SDL_SetError("nullptr pointer passed to PHYSFSSDL3_makeRWops().");
     } else {
         retval = create_iostream(handle);
     }
@@ -291,7 +291,7 @@ SDL_Storage *PHYSFSSDL3_makeStorage(void)
     iface.remove = physfssdl3storage_remove;
     iface.rename = physfssdl3storage_rename;
     iface.space_remaining = physfssdl3storage_space_remaining;
-    return SDL_OpenStorage(&iface, NULL);
+    return SDL_OpenStorage(&iface, nullptr);
 }
 
 /* end of physfssdl3.c ... */

@@ -29,6 +29,8 @@
 ///  This file written by Ryan C. Gordon.                                     
 ///                                                                           
 #include "physfs_internal.hpp"
+#include <cassert>
+
 
 constexpr PHYSFS_uint32 QPAK_SIG = 0x4B434150;   // "PACK" in ASCII
 
@@ -43,8 +45,8 @@ namespace
          BAIL_IF_ERRPASS(!__PHYSFS_readAll(io, name, 56), 0);
          BAIL_IF_ERRPASS(!__PHYSFS_readAll(io, &pos, 4), 0);
          BAIL_IF_ERRPASS(!__PHYSFS_readAll(io, &size, 4), 0);
-         size = PHYSFS_swapULE32(size);
-         pos = PHYSFS_swapULE32(pos);
+         size = PHYSFS_swapLE(size);
+         pos = PHYSFS_swapLE(pos);
          BAIL_IF_ERRPASS(!UNPK_addEntry(arc, name, 0, -1, -1, pos, size), 0);
       }
 
@@ -57,35 +59,35 @@ namespace
       PHYSFS_uint32 count = 0;
       void* unpkarc;
 
-      assert(io != NULL);  /* shouldn't ever happen. */
+      assert(io != nullptr);  /* shouldn't ever happen. */
 
-      BAIL_IF(forWriting, PHYSFS_ERR_READ_ONLY, NULL);
+      BAIL_IF(forWriting, PHYSFS_ERR_READ_ONLY, nullptr);
 
-      BAIL_IF_ERRPASS(!__PHYSFS_readAll(io, &val, 4), NULL);
-      if (PHYSFS_swapULE32(val) != QPAK_SIG)
-         BAIL(PHYSFS_ERR_UNSUPPORTED, NULL);
+      BAIL_IF_ERRPASS(!__PHYSFS_readAll(io, &val, 4), nullptr);
+      if (PHYSFS_swapLE(val) != QPAK_SIG)
+         BAIL(PHYSFS_ERR_UNSUPPORTED, nullptr);
 
       *claimed = 1;
 
-      BAIL_IF_ERRPASS(!__PHYSFS_readAll(io, &val, 4), NULL);
-      pos = PHYSFS_swapULE32(val);  /* directory table offset. */
+      BAIL_IF_ERRPASS(!__PHYSFS_readAll(io, &val, 4), nullptr);
+      pos = PHYSFS_swapLE(val);  /* directory table offset. */
 
-      BAIL_IF_ERRPASS(!__PHYSFS_readAll(io, &val, 4), NULL);
-      count = PHYSFS_swapULE32(val);
+      BAIL_IF_ERRPASS(!__PHYSFS_readAll(io, &val, 4), nullptr);
+      count = PHYSFS_swapLE(val);
 
       /* corrupted archive? */
-      BAIL_IF((count % 64) != 0, PHYSFS_ERR_CORRUPT, NULL);
+      BAIL_IF((count % 64) != 0, PHYSFS_ERR_CORRUPT, nullptr);
       count /= 64;
 
-      BAIL_IF_ERRPASS(!io->seek(io, pos), NULL);
+      BAIL_IF_ERRPASS(!io->seek(io, pos), nullptr);
 
       /* !!! FIXME: check case_sensitive and only_usascii params for this archive. */
       unpkarc = UNPK_openArchive(io, 1, 0);
-      BAIL_IF_ERRPASS(!unpkarc, NULL);
+      BAIL_IF_ERRPASS(!unpkarc, nullptr);
 
       if (!qpakLoadEntries(io, count, unpkarc)) {
          UNPK_abandonArchive(unpkarc);
-         return NULL;
+         return nullptr;
       }
 
       return unpkarc;

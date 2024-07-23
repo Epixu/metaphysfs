@@ -54,7 +54,7 @@ int main(int argc, char **argv)
 
     char **files = PHYSFS_enumerateFiles("/");
     char **i;
-    for (i = files; *i != NULL; i++)
+    for (i = files; *i != nullptr; i++)
     {
         const char *dirorfile = PHYSFS_isDirectory(*i) ? "Directory" : "File";
         printf(" * %s '%s' is in root of attached data.\n", dirorfile, *i);

@@ -37,7 +37,7 @@ static int locateOneElement(char *buf)
         return 1;  /* quick rejection: exists in current case. */
 
     ptr = strrchr(buf, '/');  /* find entry at end of path. */
-    if (ptr == NULL)
+    if (ptr == nullptr)
     {
         rc = PHYSFS_enumerateFiles("/");
         ptr = buf;
@@ -50,9 +50,9 @@ static int locateOneElement(char *buf)
         ptr++;  /* point past dirsep to entry itself. */
     } /* else */
 
-    if (rc != NULL)
+    if (rc != nullptr)
     {
-        for (i = rc; *i != NULL; i++)
+        for (i = rc; *i != nullptr; i++)
         {
             if (PHYSFS_utf8stricmp(*i, ptr) == 0)
             {
@@ -82,7 +82,7 @@ int PHYSFSEXT_locateCorrectCase(char *buf)
     if (*ptr == '\0')
         return 0;  /* Uh...I guess that's success. */
 
-    while ( (ptr = strchr(ptr + 1, '/')) != NULL )
+    while ( (ptr = strchr(ptr + 1, '/')) != nullptr )
     {
         *ptr = '\0';  /* block this path section off */
         rc = locateOneElement(buf);
@@ -139,7 +139,7 @@ int main(int argc, char **argv)
 
     f = PHYSFS_openWrite("/a/b/c/x.txt");
     PHYSFS_close(f);
-    if (f == NULL)
+    if (f == nullptr)
     {
         fprintf(stderr, "PHYSFS_openWrite(): %s\n", PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
         PHYSFS_deinit();
@@ -148,7 +148,7 @@ int main(int argc, char **argv)
 
     f = PHYSFS_openWrite("/a/b/C/X.txt");
     PHYSFS_close(f);
-    if (f == NULL)
+    if (f == nullptr)
     {
         fprintf(stderr, "PHYSFS_openWrite(): %s\n", PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
         PHYSFS_deinit();

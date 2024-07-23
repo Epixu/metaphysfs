@@ -52,7 +52,7 @@ extern "C" {
  * char **rc = PHYSFS_enumerateFilesWildcard("savegames", "*.sav", 0);
  * char **i;
  *
- * for (i = rc; *i != NULL; i++)
+ * for (i = rc; *i != nullptr; i++)
  *     printf(" * We've got [%s].\n", *i);
  *
  * PHYSFS_freeList(rc);
@@ -98,7 +98,7 @@ PHYSFS_DECL char **PHYSFSEXT_enumerateFilesWildcard(const char *dir,
  *
  *    \param list Pointer previously returned by
  *                PHYSFSEXT_enumerateFilesWildcard(). It is safe to pass a
- *                NULL here.
+ *                nullptr here.
  *
  * \sa PHYSFSEXT_enumerateFilesWildcard
  */
@@ -124,7 +124,7 @@ PHYSFS_DECL void PHYSFSEXT_freeEnumeration(char **list);
  * }
  *
  * // ...
- * PHYSFS_enumerateFilesCallbackWildcard("savegames","*.sav",0,printDir,NULL);
+ * PHYSFS_enumerateFilesCallbackWildcard("savegames","*.sav",0,printDir,nullptr);
  * \endcode
  *
  * Items sent to the callback are not guaranteed to be in any order whatsoever.
@@ -144,7 +144,7 @@ PHYSFS_DECL void PHYSFSEXT_freeEnumeration(char **list);
  *    \param caseSensitive Zero for case-insensitive matching,
  *                         non-zero for case-sensitive.
  *    \param c Callback function to notify about search path elements.
- *    \param d Application-defined data passed to callback. Can be NULL.
+ *    \param d Application-defined data passed to callback. Can be nullptr.
  *
  * \sa PHYSFS_EnumFilesCallback
  * \sa PHYSFS_enumerateFiles

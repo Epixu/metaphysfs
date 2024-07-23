@@ -58,15 +58,15 @@ static char *getUserDirByUID(void)
 {
     uid_t uid = getuid();
     struct passwd *pw;
-    char *retval = NULL;
+    char *retval = nullptr;
 
     pw = getpwuid(uid);
-    if ((pw != NULL) && (pw->pw_dir != NULL) && (*pw->pw_dir != '\0'))
+    if ((pw != nullptr) && (pw->pw_dir != nullptr) && (*pw->pw_dir != '\0'))
     {
         const size_t dlen = strlen(pw->pw_dir);
         const size_t add_dirsep = (pw->pw_dir[dlen-1] != '/') ? 1 : 0;
         retval = (char *) allocator.Malloc(dlen + 1 + add_dirsep);
-        if (retval != NULL)
+        if (retval != nullptr)
         {
             strcpy(retval, pw->pw_dir);
             if (add_dirsep)
@@ -83,11 +83,11 @@ static char *getUserDirByUID(void)
 
 char *__PHYSFS_platformCalcUserDir(void)
 {
-    char *retval = NULL;
+    char *retval = nullptr;
     char *envr = getenv("HOME");
 
     /* if the environment variable was set, make sure it's really a dir. */
-    if (envr != NULL)
+    if (envr != nullptr)
     {
         struct stat statbuf;
         if ((stat(envr, &statbuf) != -1) && (S_ISDIR(statbuf.st_mode)))
@@ -107,7 +107,7 @@ char *__PHYSFS_platformCalcUserDir(void)
         } /* if */
     } /* if */
 
-    if (retval == NULL)
+    if (retval == nullptr)
         retval = getUserDirByUID();
 
     return retval;
@@ -123,9 +123,9 @@ PHYSFS_EnumerateCallbackResult __PHYSFS_platformEnumerate(const char *dirname,
     PHYSFS_EnumerateCallbackResult retval = PHYSFS_ENUM_OK;
 
     dir = opendir(dirname);
-    BAIL_IF(dir == NULL, errcodeFromErrno(), PHYSFS_ENUM_ERROR);
+    BAIL_IF(dir == nullptr, errcodeFromErrno(), PHYSFS_ENUM_ERROR);
 
-    while ((retval == PHYSFS_ENUM_OK) && ((ent = readdir(dir)) != NULL))
+    while ((retval == PHYSFS_ENUM_OK) && ((ent = readdir(dir)) != nullptr))
     {
         const char *name = ent->d_name;
         if (name[0] == '.')  /* ignore "." and ".." */
@@ -182,7 +182,7 @@ static void *doOpen(const char *filename, int mode)
     do {
         fd = open(filename, mode, S_IRUSR | S_IWUSR);
     } while ((fd < 0) && (errno == EINTR));
-    BAIL_IF(fd < 0, errcodeFromErrno(), NULL);
+    BAIL_IF(fd < 0, errcodeFromErrno(), nullptr);
 
 #if !defined(O_CLOEXEC) && defined(FD_CLOEXEC)
     set_CLOEXEC(fd);
@@ -194,7 +194,7 @@ static void *doOpen(const char *filename, int mode)
         {
             const int err = errno;
             close(fd);
-            BAIL(errcodeFromErrnoError(err), NULL);
+            BAIL(errcodeFromErrnoError(err), nullptr);
         } /* if */
     } /* if */
 
@@ -202,7 +202,7 @@ static void *doOpen(const char *filename, int mode)
     if (!retval)
     {
         close(fd);
-        BAIL(PHYSFS_ERR_OUT_OF_MEMORY, NULL);
+        BAIL(PHYSFS_ERR_OUT_OF_MEMORY, nullptr);
     } /* if */
 
     *retval = fd;
@@ -383,12 +383,12 @@ void *__PHYSFS_platformCreateMutex(void)
 {
     int rc;
     PthreadMutex *m = (PthreadMutex *) allocator.Malloc(sizeof (PthreadMutex));
-    BAIL_IF(!m, PHYSFS_ERR_OUT_OF_MEMORY, NULL);
-    rc = pthread_mutex_init(&m->mutex, NULL);
+    BAIL_IF(!m, PHYSFS_ERR_OUT_OF_MEMORY, nullptr);
+    rc = pthread_mutex_init(&m->mutex, nullptr);
     if (rc != 0)
     {
         allocator.Free(m);
-        BAIL(PHYSFS_ERR_OS_ERROR, NULL);
+        BAIL(PHYSFS_ERR_OS_ERROR, nullptr);
     } /* if */
 
     m->count = 0;

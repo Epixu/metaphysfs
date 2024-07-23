@@ -44,7 +44,7 @@ extern "C" {
  *  opening files through this method.
  *
  *   @param filename File to open in platform-independent notation.
- *  @return A valid SDL_IOStream on success, NULL on error. Specifics
+ *  @return A valid SDL_IOStream on success, nullptr on error. Specifics
  *           of the error can be gleaned from SDL_GetError().
  */
 PHYSFS_DECL SDL_IOStream *PHYSFSSDL3_openRead(const char *fname);
@@ -56,7 +56,7 @@ PHYSFS_DECL SDL_IOStream *PHYSFSSDL3_openRead(const char *fname);
  *  opening files through this method.
  *
  *   @param filename File to open in platform-independent notation.
- *  @return A valid SDL_IOStream on success, NULL on error. Specifics
+ *  @return A valid SDL_IOStream on success, nullptr on error. Specifics
  *           of the error can be gleaned from SDL_GetError().
  */
 PHYSFS_DECL SDL_IOStream *PHYSFSSDL3_openWrite(const char *fname);
@@ -68,7 +68,7 @@ PHYSFS_DECL SDL_IOStream *PHYSFSSDL3_openWrite(const char *fname);
  *  opening files through this method.
  *
  *   @param filename File to open in platform-independent notation.
- *  @return A valid SDL_IOStream on success, NULL on error. Specifics
+ *  @return A valid SDL_IOStream on success, nullptr on error. Specifics
  *           of the error can be gleaned from SDL_GetError().
  */
 PHYSFS_DECL SDL_IOStream *PHYSFSSDL3_openAppend(const char *fname);
@@ -80,7 +80,7 @@ PHYSFS_DECL SDL_IOStream *PHYSFSSDL3_openAppend(const char *fname);
  *  RWops is closed.
  *
  *   @param handle a valid PhysicsFS file handle.
- *  @return A valid SDL_IOStream on success, NULL on error. Specifics
+ *  @return A valid SDL_IOStream on success, nullptr on error. Specifics
  *           of the error can be gleaned from SDL_GetError().
  */
 PHYSFS_DECL SDL_IOStream *PHYSFSSDL3_makeIOStream(PHYSFS_File *handle);
@@ -91,7 +91,7 @@ PHYSFS_DECL SDL_IOStream *PHYSFSSDL3_makeIOStream(PHYSFS_File *handle);
  * through SDL3's interface. You can still manipulate it outside
  * of SDL_Storage by calling PhysicsFS APIs directly.
  *
- *  @return A valid SDL_Storage on success, NULL on error. Specifics
+ *  @return A valid SDL_Storage on success, nullptr on error. Specifics
  *           of the error can be gleaned from SDL_GetError().
  */
 PHYSFS_DECL SDL_Storage *PHYSFSSDL3_makeStorage(void);

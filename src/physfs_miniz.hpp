@@ -533,7 +533,7 @@ static int mz_inflateInit2(mz_streamp pStream, int window_bits)
 
   pStream->data_type = 0;
   pStream->adler = 0;
-  pStream->msg = NULL;
+  pStream->msg = nullptr;
   pStream->total_in = 0;
   pStream->total_out = 0;
   pStream->reserved = 0;
@@ -654,7 +654,7 @@ static int mz_inflateEnd(mz_streamp pStream)
   if (pStream->state)
   {
     pStream->zfree(pStream->opaque, pStream->state);
-    pStream->state = NULL;
+    pStream->state = nullptr;
   }
   return MZ_OK;
 }

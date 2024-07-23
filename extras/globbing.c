@@ -129,9 +129,9 @@ void PHYSFSEXT_freeEnumeration(char **list)
 {
     const PHYSFS_Allocator *allocator = PHYSFS_getAllocator();
     int i;
-    if (list != NULL)
+    if (list != nullptr)
     {
-        for (i = 0; list[i] != NULL; i++)
+        for (i = 0; list[i] != nullptr; i++)
             allocator->Free(list[i]);
         allocator->Free(list);
     } /* if */
@@ -143,12 +143,12 @@ char **PHYSFSEXT_enumerateFilesWildcard(const char *dir, const char *wildcard,
 {
     const PHYSFS_Allocator *allocator = PHYSFS_getAllocator();
     char **list = PHYSFS_enumerateFiles(dir);
-    char **retval = NULL;
+    char **retval = nullptr;
     int totalmatches = 0;
     int matches = 0;
     char **i;
 
-    for (i = list; *i != NULL; i++)
+    for (i = list; *i != nullptr; i++)
     {
         #if 0
         printf("matchesPattern: '%s' vs '%s' (%s) ... %s\n", *i, wildcard,
@@ -160,19 +160,19 @@ char **PHYSFSEXT_enumerateFilesWildcard(const char *dir, const char *wildcard,
     } /* for */
 
     retval = (char **) allocator->Malloc(sizeof (char *) * (totalmatches+1));
-    if (retval != NULL)
+    if (retval != nullptr)
     {
-        for (i = list; ((matches < totalmatches) && (*i != NULL)); i++)
+        for (i = list; ((matches < totalmatches) && (*i != nullptr)); i++)
         {
             if (matchesPattern(*i, wildcard, caseSensitive))
             {
                 retval[matches] = (char *) allocator->Malloc(strlen(*i) + 1);
-                if (retval[matches] == NULL)
+                if (retval[matches] == nullptr)
                 {
                     while (matches--)
                         allocator->Free(retval[matches]);
                     allocator->Free(retval);
-                    retval = NULL;
+                    retval = nullptr;
                     break;
                 } /* if */
                 strcpy(retval[matches], *i);
@@ -180,10 +180,10 @@ char **PHYSFSEXT_enumerateFilesWildcard(const char *dir, const char *wildcard,
             } /* if */
         } /* for */
 
-        if (retval != NULL)
+        if (retval != nullptr)
         {
             assert(totalmatches == matches);
-            retval[matches] = NULL;
+            retval[matches] = nullptr;
         } /* if */
     } /* if */
 

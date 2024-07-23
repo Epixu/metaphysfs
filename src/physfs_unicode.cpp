@@ -218,7 +218,7 @@ static PHYSFS_uint32 utf16codepoint(const PHYSFS_uint16 **_str)
 
     *_str = src;
     return cp;
-} /* utf16codepoint */
+}
 
 static PHYSFS_uint32 utf32codepoint(const PHYSFS_uint32 **_str)
 {
@@ -232,8 +232,7 @@ static PHYSFS_uint32 utf32codepoint(const PHYSFS_uint32 **_str)
 
     *_str = src;
     return cp;
-} /* utf32codepoint */
-
+}
 
 void PHYSFS_utf8ToUcs4(const char *src, PHYSFS_uint32 *dst, PHYSFS_uint64 len)
 {
@@ -247,18 +246,15 @@ void PHYSFS_utf8ToUcs4(const char *src, PHYSFS_uint32 *dst, PHYSFS_uint64 len)
             cp = UNICODE_BOGUS_CHAR_CODEPOINT;
         *(dst++) = cp;
         len -= sizeof (PHYSFS_uint32);
-    } /* while */
+    }
 
     *dst = 0;
-} /* PHYSFS_utf8ToUcs4 */
+}
 
-
-void PHYSFS_utf8ToUcs2(const char *src, PHYSFS_uint16 *dst, PHYSFS_uint64 len)
-{
+void PHYSFS_utf8ToUcs2(const char *src, PHYSFS_uint16 *dst, PHYSFS_uint64 len) {
     len -= sizeof (PHYSFS_uint16);   /* save room for null char. */
-    while (len >= sizeof (PHYSFS_uint16))
-    {
-        PHYSFS_uint32 cp = __PHYSFS_utf8codepoint(&src);
+    while (len >= sizeof (PHYSFS_uint16)) {
+        auto cp = __PHYSFS_utf8codepoint(&src);
         if (cp == 0)
             break;
         else if (cp == UNICODE_BOGUS_CHAR_VALUE)
@@ -267,12 +263,12 @@ void PHYSFS_utf8ToUcs2(const char *src, PHYSFS_uint16 *dst, PHYSFS_uint64 len)
         if (cp > 0xFFFF)  /* UTF-16 surrogates (bogus chars in UCS-2) */
             cp = UNICODE_BOGUS_CHAR_CODEPOINT;
 
-        *(dst++) = cp;
+        *(dst++) = static_cast<PHYSFS_uint16>(cp);
         len -= sizeof (PHYSFS_uint16);
-    } /* while */
+    }
 
     *dst = 0;
-} /* PHYSFS_utf8ToUcs2 */
+}
 
 
 void PHYSFS_utf8ToUtf16(const char *src, PHYSFS_uint16 *dst, PHYSFS_uint64 len)

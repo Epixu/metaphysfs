@@ -4,24 +4,23 @@
 ///  This file written by Ryan C. Gordon.                                     
 ///                                                                           
 #include "physfs_internal.hpp"
+#include <cstring>
+#include <cassert>
+
+using namespace MetaPhysFS;
 
 // There's no PHYSFS_Io interface here. Use __PHYSFS_createNativeIo()   
 
-
-namespace {
+namespace
+{
    char* cvtToDependent(const char* prepend, const char* path, char* buf, const size_t buflen) {
-      BAIL_IF(buf == NULL, PHYSFS_ERR_OUT_OF_MEMORY, NULL);
+      BAIL_IF(not buf, PHYSFS_ERR_OUT_OF_MEMORY, nullptr);
       snprintf(buf, buflen, "%s%s", prepend ? prepend : "", path);
 
-   #if not __PHYSFS_STANDARD_DIRSEP
-      assert(__PHYSFS_platformDirSeparator != '/');
-      {
-         char* p;
-         for (p = strchr(buf, '/'); p != NULL; p = strchr(p + 1, '/'))
+      if constexpr (__PHYSFS_platformDirSeparator != '/') {
+         for (auto p = strchr(buf, '/'); p; p = strchr(p + 1, '/'))
             *p = __PHYSFS_platformDirSeparator;
       }
-   #endif
-
       return buf;
    }
 
@@ -33,19 +32,17 @@ namespace {
    void* DIR_openArchive(PHYSFS_Io* io, const char* name, int forWriting, int* claimed) {
       PHYSFS_Stat st;
       const char dirsep = __PHYSFS_platformDirSeparator;
-      char* retval = NULL;
+      char* retval = nullptr;
       const size_t namelen = strlen(name);
       const size_t seplen = 1;
 
-      assert(io == NULL);  /* shouldn't create an Io for these. */
-      BAIL_IF_ERRPASS(!__PHYSFS_platformStat(name, &st, 1), NULL);
-
-      if (st.filetype != PHYSFS_FILETYPE_DIRECTORY)
-         BAIL(PHYSFS_ERR_UNSUPPORTED, NULL);
+      assert(io == nullptr);  /* shouldn't create an Io for these. */
+      BAIL_IF_ERRPASS(!__PHYSFS_platformStat(name, &st, 1), nullptr);
+      BAIL_IF(st.filetype != PHYSFS_FILETYPE_DIRECTORY, PHYSFS_ERR_UNSUPPORTED, nullptr);
 
       *claimed = 1;
-      retval = allocator.Malloc(namelen + seplen + 1);
-      BAIL_IF(retval == NULL, PHYSFS_ERR_OUT_OF_MEMORY, NULL);
+      retval = PHYSFS_Allocator::Malloc<char>(namelen + seplen + 1);
+      BAIL_IF(not retval, PHYSFS_ERR_OUT_OF_MEMORY, nullptr);
 
       strcpy(retval, name);
 
@@ -56,8 +53,7 @@ namespace {
       }
 
       return retval;
-   } /* DIR_openArchive */
-
+   }
 
    PHYSFS_EnumerateCallbackResult DIR_enumerate(void* opaque,
       const char* dname, PHYSFS_EnumerateCallback cb,
@@ -69,44 +65,38 @@ namespace {
       retval = __PHYSFS_platformEnumerate(d, cb, origdir, callbackdata);
       __PHYSFS_smallFree(d);
       return retval;
-   } /* DIR_enumerate */
-
+   }
 
    PHYSFS_Io* doOpen(void* opaque, const char* name, const int mode) {
-      PHYSFS_Io* io = NULL;
-      char* f = NULL;
+      PHYSFS_Io* io = nullptr;
+      char* f = nullptr;
 
       CVT_TO_DEPENDENT(f, opaque, name);
-      BAIL_IF_ERRPASS(!f, NULL);
+      BAIL_IF_ERRPASS(!f, nullptr);
 
       io = __PHYSFS_createNativeIo(f, mode);
-      if (io == NULL) {
+      if (io == nullptr) {
          const PHYSFS_ErrorCode err = PHYSFS_getLastErrorCode();
          PHYSFS_Stat statbuf;
          __PHYSFS_platformStat(f, &statbuf, 0);  /* !!! FIXME: why are we stating here? */
          PHYSFS_setErrorCode(err);
-      } /* if */
+      }
 
       __PHYSFS_smallFree(f);
-
       return io;
-   } /* doOpen */
-
+   }
 
    PHYSFS_Io* DIR_openRead(void* opaque, const char* filename) {
       return doOpen(opaque, filename, 'r');
-   } /* DIR_openRead */
-
+   }
 
    PHYSFS_Io* DIR_openWrite(void* opaque, const char* filename) {
       return doOpen(opaque, filename, 'w');
-   } /* DIR_openWrite */
-
+   }
 
    PHYSFS_Io* DIR_openAppend(void* opaque, const char* filename) {
       return doOpen(opaque, filename, 'a');
-   } /* DIR_openAppend */
-
+   }
 
    int DIR_remove(void* opaque, const char* name) {
       int retval;
@@ -117,8 +107,7 @@ namespace {
       retval = __PHYSFS_platformDelete(f);
       __PHYSFS_smallFree(f);
       return retval;
-   } /* DIR_remove */
-
+   }
 
    int DIR_mkdir(void* opaque, const char* name) {
       int retval;
@@ -129,13 +118,11 @@ namespace {
       retval = __PHYSFS_platformMkDir(f);
       __PHYSFS_smallFree(f);
       return retval;
-   } /* DIR_mkdir */
-
+   }
 
    void DIR_closeArchive(void* opaque) {
-      allocator.Free(opaque);
-   } /* DIR_closeArchive */
-
+      PHYSFS_Allocator::Free(opaque);
+   }
 
    int DIR_stat(void* opaque, const char* name, PHYSFS_Stat* stat) {
       int retval = 0;
@@ -146,18 +133,16 @@ namespace {
       retval = __PHYSFS_platformStat(d, stat, 0);
       __PHYSFS_smallFree(d);
       return retval;
-   } /* DIR_stat */
+   }
 }
 
-const PHYSFS_Archiver __PHYSFS_Archiver_DIR =
-{
-    CURRENT_PHYSFS_ARCHIVER_API_VERSION,
-    {
+const PHYSFS_Archiver __PHYSFS_Archiver_DIR = {
+    CURRENT_PHYSFS_ARCHIVER_API_VERSION, {
         "",
         "Non-archive, direct filesystem I/O",
         "Ryan C. Gordon <icculus@icculus.org>",
         "https://icculus.org/physfs/",
-        1,  /* supportsSymlinks */
+        1,  // supportsSymlinks
     },
     DIR_openArchive,
     DIR_enumerate,

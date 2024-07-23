@@ -76,16 +76,16 @@ static void *WAD_openArchive(PHYSFS_Io *io, const char *name,
     PHYSFS_uint32 directoryOffset;
     void *unpkarc;
 
-    assert(io != NULL);  /* shouldn't ever happen. */
+    assert(io != nullptr);  /* shouldn't ever happen. */
 
-    BAIL_IF(forWriting, PHYSFS_ERR_READ_ONLY, NULL);
-    BAIL_IF_ERRPASS(!__PHYSFS_readAll(io, buf, sizeof (buf)), NULL);
+    BAIL_IF(forWriting, PHYSFS_ERR_READ_ONLY, nullptr);
+    BAIL_IF_ERRPASS(!__PHYSFS_readAll(io, buf, sizeof (buf)), nullptr);
     if ((memcmp(buf, "IWAD", 4) != 0) && (memcmp(buf, "PWAD", 4) != 0))
-        BAIL(PHYSFS_ERR_UNSUPPORTED, NULL);
+        BAIL(PHYSFS_ERR_UNSUPPORTED, nullptr);
 
     *claimed = 1;
 
-    BAIL_IF_ERRPASS(!__PHYSFS_readAll(io, &count, sizeof (count)), NULL);
+    BAIL_IF_ERRPASS(!__PHYSFS_readAll(io, &count, sizeof (count)), nullptr);
     count = PHYSFS_swapULE32(count);
 
     BAIL_IF_ERRPASS(!__PHYSFS_readAll(io, &directoryOffset, 4), 0);
@@ -94,12 +94,12 @@ static void *WAD_openArchive(PHYSFS_Io *io, const char *name,
     BAIL_IF_ERRPASS(!io->seek(io, directoryOffset), 0);
 
     unpkarc = UNPK_openArchive(io, 0, 1);
-    BAIL_IF_ERRPASS(!unpkarc, NULL);
+    BAIL_IF_ERRPASS(!unpkarc, nullptr);
 
     if (!wadLoadEntries(io, count, unpkarc))
     {
         UNPK_abandonArchive(unpkarc);
-        return NULL;
+        return nullptr;
     } /* if */
 
     return unpkarc;
