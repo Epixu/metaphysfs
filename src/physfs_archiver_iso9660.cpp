@@ -25,9 +25,7 @@
  * Problems
  * - Ambiguities in the standard
  */
-
-#define __PHYSICSFS_INTERNAL__
-#include "physfs_internal.h"
+#include "physfs_internal.hpp"
 
 #if PHYSFS_SUPPORTS_ISO9660
 

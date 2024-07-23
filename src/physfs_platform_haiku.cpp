@@ -5,8 +5,6 @@
  *
  *  This file written by Ryan C. Gordon.
  */
-
-#define __PHYSICSFS_INTERNAL__
 #include "physfs_platforms.h"
 
 #ifdef PHYSFS_PLATFORM_HAIKU

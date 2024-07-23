@@ -7,9 +7,7 @@
  */
 
 /* This is tested against QNX 7 at the moment. */
-
-#define __PHYSICSFS_INTERNAL__
-#include "physfs_platforms.h"
+#include "physfs_platforms.hpp"
 
 #ifdef PHYSFS_PLATFORM_QNX
 

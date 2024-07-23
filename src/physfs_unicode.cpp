@@ -1,8 +1,5 @@
-#define __PHYSICSFS_INTERNAL__
-#include "physfs_internal.h"
-
-#include "physfs_casefolding.h"
-
+#include "physfs_internal.hpp"
+#include "physfs_casefolding.hpp"
 
 /*
  * From rfc3629, the UTF-8 spec:

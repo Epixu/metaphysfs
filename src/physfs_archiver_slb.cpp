@@ -14,9 +14,7 @@
  * This file written by Aleksi Nurmi, based on the GRP archiver by
  * Ryan C. Gordon.
  */
-
-#define __PHYSICSFS_INTERNAL__
-#include "physfs_internal.h"
+#include "physfs_internal.hpp"
 
 #if PHYSFS_SUPPORTS_SLB
 

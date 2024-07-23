@@ -6,9 +6,7 @@
  *  This file written by Ryan C. Gordon, with some peeking at "unzip.c"
  *   by Gilles Vollant.
  */
-
-#define __PHYSICSFS_INTERNAL__
-#include "physfs_internal.h"
+#include "physfs_internal.hpp"
 
 #if PHYSFS_SUPPORTS_ZIP
 
@@ -20,7 +18,7 @@
 #else
 #define MINIZ_LITTLE_ENDIAN 0
 #endif
-#include "physfs_miniz.h"
+#include "physfs_miniz.hpp"
 
 /*
  * A buffer of ZIP_READBUFSIZE is allocated for each compressed file opened,

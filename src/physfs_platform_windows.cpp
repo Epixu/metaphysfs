@@ -5,9 +5,7 @@
  *
  *  This file written by Ryan C. Gordon, and made sane by Gregory S. Read.
  */
-
-#define __PHYSICSFS_INTERNAL__
-#include "physfs_platforms.h"
+#include "physfs_platforms.hpp"
 
 #ifdef PHYSFS_PLATFORM_WINDOWS
 
@@ -40,7 +38,7 @@
 #undef allocator
 #endif
 
-#include "physfs_internal.h"
+#include "physfs_internal.hpp"
 
 /*
  * Users without the platform SDK don't have this defined.  The original docs

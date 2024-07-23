@@ -7,9 +7,7 @@
  *
  *  This file written by Ryan C. Gordon.
  */
-
-#define __PHYSICSFS_INTERNAL__
-#include "physfs_internal.h"
+#include "physfs_internal.hpp"
 
 #ifndef PHYSFS_Swap16
 static inline PHYSFS_uint16 PHYSFS_Swap16(PHYSFS_uint16 D)

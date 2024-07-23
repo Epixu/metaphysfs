@@ -10,10 +10,6 @@
 #ifndef _INCLUDE_PHYSFS_CASEFOLDING_H_
 #define _INCLUDE_PHYSFS_CASEFOLDING_H_
 
-#ifndef __PHYSICSFS_INTERNAL__
-#error Do not include this header from your applications.
-#endif
-
 /* We build three simple hashmaps here: one that maps Unicode codepoints to
 a one, two, or three lowercase codepoints. To retrieve this info: look at
 case_fold_hashX, where X is 1, 2, or 3. Most foldable codepoints fold to one,

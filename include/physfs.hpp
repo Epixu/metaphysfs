@@ -216,13 +216,7 @@
  *
  *  \author Ryan C. Gordon.
  */
-
-#ifndef _INCLUDE_PHYSFS_H_
-#define _INCLUDE_PHYSFS_H_
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#pragma once
 
 #if defined(PHYSFS_DECL)
 /* do nothing. */
@@ -3915,16 +3909,3 @@ PHYSFS_DECL int PHYSFS_deregisterArchiver(const char *ext);
  *           PHYSFS_getLastErrorCode() to obtain the specific error.
  */
 PHYSFS_DECL int PHYSFS_setRoot(const char *archive, const char *subdir);
-
-
-/* Everything above this line is part of the PhysicsFS 3.1 API. */
-
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif  /* !defined _INCLUDE_PHYSFS_H_ */
-
-/* end of physfs.h ... */
-

@@ -41,9 +41,7 @@
  * This file written by Travis Wells, based on the GRP archiver by
  *  Ryan C. Gordon.
  */
-
-#define __PHYSICSFS_INTERNAL__
-#include "physfs_internal.h"
+#include "physfs_internal.hpp"
 
 #if PHYSFS_SUPPORTS_WAD
 

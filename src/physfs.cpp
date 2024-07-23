@@ -1,57 +1,24 @@
-/**
- * PhysicsFS; a portable, flexible file i/o abstraction.
- *
- * Documentation is in physfs.h. It's verbose, honest.  :)
- *
- * Please see the file LICENSE.txt in the source's root directory.
- *
- *  This file written by Ryan C. Gordon.
- */
+///                                                                              
+/// PhysicsFS; a portable, flexible file i/o abstraction.                        
+/// Documentation is in physfs.h. It's verbose, honest.  :)                      
+/// Please see the file LICENSE.txt in the source's root directory.              
+/// This file written by Ryan C. Gordon.                                         
+///                                                                              
+#include "physfs_internal.hpp"
 
-#define __PHYSICSFS_INTERNAL__
-#include "physfs_internal.h"
 
-#if defined(_MSC_VER)
-/* this code came from https://stackoverflow.com/a/8712996 */
-int __PHYSFS_msvc_vsnprintf(char *outBuf, size_t size, const char *format, va_list ap)
+struct DirHandle
 {
-    int count = -1;
-
-    if (size != 0)
-        count = _vsnprintf_s(outBuf, size, _TRUNCATE, format, ap);
-    if (count == -1)
-        count = _vscprintf(format, ap);
-
-    return count;
-}
-
-int __PHYSFS_msvc_snprintf(char *outBuf, size_t size, const char *format, ...)
-{
-    int count;
-    va_list ap;
-
-    va_start(ap, format);
-    count = __PHYSFS_msvc_vsnprintf(outBuf, size, format, ap);
-    va_end(ap);
-
-    return count;
-}
-#endif
-
-
-typedef struct __PHYSFS_DIRHANDLE__
-{
-    void *opaque;  /* Instance data unique to the archiver. */
-    char *dirName;  /* Path to archive in platform-dependent notation. */
-    char *mountPoint; /* Mountpoint in virtual file tree. */
-    char *root;  /* subdirectory of archiver to use as root of archive (NULL for actual root) */
+    void* opaque;  /* Instance data unique to the archiver. */
+    char* dirName;  /* Path to archive in platform-dependent notation. */
+    char* mountPoint; /* Mountpoint in virtual file tree. */
+    char* root;  /* subdirectory of archiver to use as root of archive (NULL for actual root) */
     size_t rootlen;  /* subdirectory of archiver to use as root of archive (NULL for actual root) */
-    const PHYSFS_Archiver *funcs;  /* Ptr to archiver info for this handle. */
-    struct __PHYSFS_DIRHANDLE__ *next;  /* linked list stuff. */
-} DirHandle;
+    const PHYSFS_Archiver* funcs;  /* Ptr to archiver info for this handle. */
+    struct DirHandle* next;  /* linked list stuff. */
+};
 
-
-typedef struct __PHYSFS_FILEHANDLE__
+struct FileHandle
 {
     PHYSFS_Io *io;  /* Instance data unique to the archiver for this file. */
     PHYSFS_uint8 forReading; /* Non-zero if reading, zero if write/append */
@@ -60,16 +27,15 @@ typedef struct __PHYSFS_FILEHANDLE__
     size_t bufsize;  /* Bufsize, if set (0 otherwise). Don't touch! */
     size_t buffill;  /* Buffer fill size. Don't touch! */
     size_t bufpos;  /* Buffer position. Don't touch! */
-    struct __PHYSFS_FILEHANDLE__ *next;  /* linked list stuff. */
-} FileHandle;
+    struct FileHandle* next;  /* linked list stuff. */
+};
 
-
-typedef struct __PHYSFS_ERRSTATETYPE__
+struct ErrState
 {
-    void *tid;
+    void* tid;
     PHYSFS_ErrorCode code;
-    struct __PHYSFS_ERRSTATETYPE__ *next;
-} ErrState;
+    struct ErrState* next;
+};
 
 
 /* General PhysicsFS state ... */

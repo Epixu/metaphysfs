@@ -1,29 +1,13 @@
-project(LangulusModFileSystemTest)
+add_executable(test_physfs test_metaphysfs.cpp)
+target_link_libraries(test_physfs PRIVATE ${PHYSFS_LIB_TARGET} ${OTHER_LDFLAGS})
 
-add_executable(LangulusModFileSystemTest
-    Main.cpp
-    TestFileSystem.cpp
-)
-
-target_link_libraries(LangulusModFileSystemTest
-    PRIVATE		Langulus
-                Catch2
-)
-
-add_test(
-    NAME		LangulusModFileSystemTest
-    COMMAND		LangulusModFileSystemTest
-)
-
-langulus_copy_dlls(LangulusModFileSystemTest ON LangulusModFileSystemTest)
-langulus_copy_dlls_advanced(LangulusModFileSystemTest
-    TO			LangulusModFileSystemTest
-    FROM		LangulusModFileSystem
-)
-
-# Make the write and read data dir for PhysFS, because it doesn't have access   
-add_custom_command(
-    TARGET LangulusModFileSystemTest POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:LangulusModFileSystemTest>/data/test folder"
-    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/test.txt" "$<TARGET_FILE_DIR:LangulusModFileSystemTest>/data/test.txt"
-)
+find_path(READLINE_H readline/readline.hpp)
+find_path(HISTORY_H readline/history.hpp)
+find_library(READLINE_LIBRARY readline)
+find_package(Curses)
+if(READLINE_H AND HISTORY_H AND READLINE_LIBRARY AND CURSES_FOUND)
+    set(HAVE_SYSTEM_READLINE TRUE)
+    target_link_libraries(test_physfs PRIVATE ${READLINE_LIBRARY} ${CURSES_LIBRARIES})
+    target_include_directories(test_physfs SYSTEM PRIVATE ${READLINE_H} ${HISTORY_H})
+    target_compile_definitions(test_physfs PRIVATE PHYSFS_HAVE_READLINE=1)
+endif()

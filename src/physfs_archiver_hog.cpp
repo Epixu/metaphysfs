@@ -41,9 +41,7 @@
  *
  * This file written by Bradley Bell and Ryan C. Gordon.
  */
-
-#define __PHYSICSFS_INTERNAL__
-#include "physfs_internal.h"
+#include "physfs_internal.hpp"
 
 #if PHYSFS_SUPPORTS_HOG
 

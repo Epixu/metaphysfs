@@ -11,9 +11,7 @@
 /* (There used to be instructions on how to make a WinRT project, but at
    this point, either CMake will do it for you or you should just drop
    PhysicsFS's sources into your existing project. --ryan.) */
-
-#define __PHYSICSFS_INTERNAL__
-#include "physfs_platforms.h"
+#include "physfs_platforms.hpp"
 
 #ifdef PHYSFS_PLATFORM_WINRT
 

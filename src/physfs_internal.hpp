@@ -1,32 +1,24 @@
-/*
- * Internal function/structure declaration. Do NOT include in your
- *  application.
- *
- * Please see the file LICENSE.txt in the source's root directory.
- *
- *  This file written by Ryan C. Gordon.
- */
+///                                                                           
+/// Internal function/structure declaration. Do NOT include in your           
+/// application.                                                              
+/// Please see the file LICENSE.txt in the source's root directory.           
+/// This file written by Ryan C. Gordon.                                      
+///                                                                           
+#pragma once
 
-#ifndef _INCLUDE_PHYSFS_INTERNAL_H_
-#define _INCLUDE_PHYSFS_INTERNAL_H_
-
-#ifndef __PHYSICSFS_INTERNAL__
-#error Do not include this header from your applications.
+// Turn off MSVC warnings that are aggressively anti-portability        
+#if defined(_MSC_VER) and not defined(_CRT_SECURE_NO_WARNINGS)
+   #define _CRT_SECURE_NO_WARNINGS 1
 #endif
 
-/* Turn off MSVC warnings that are aggressively anti-portability. */
-#if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)
-#define _CRT_SECURE_NO_WARNINGS 1
-#endif
+#include "physfs.hpp"
 
-#include "physfs.h"
-
-/* The holy trinity. */
+// The holy trinity                                                     
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "physfs_platforms.h"
+#include "physfs_platforms.hpp"
 
 #include <assert.h>
 
@@ -40,10 +32,6 @@
 
 #if defined(PHYSFS_PLATFORM_SOLARIS) || defined(PHYSFS_PLATFORM_LINUX) || defined(PHYSFS_PLATFORM_OGC)
 #include <alloca.h>
-#endif
-
-#ifdef __cplusplus
-extern "C" {
 #endif
 
 #ifdef __GNUC__
@@ -239,33 +227,32 @@ extern void SZIP_global_init(void);
 #define PHYSFS_BIG_ENDIAN  4321
 
 #ifdef __linux__
-#include <endian.h>
-#define PHYSFS_BYTEORDER  __BYTE_ORDER
+   #include <endian.h>
+   #define PHYSFS_BYTEORDER  __BYTE_ORDER
 #elif defined(__OpenBSD__) || defined(__DragonFly__)
-#include <endian.h>
-#define PHYSFS_BYTEORDER  BYTE_ORDER
+   #include <endian.h>
+   #define PHYSFS_BYTEORDER  BYTE_ORDER
 #elif defined(__FreeBSD__) || defined(__NetBSD__)
-#include <sys/endian.h>
-#define PHYSFS_BYTEORDER  BYTE_ORDER
+   #include <sys/endian.h>
+   #define PHYSFS_BYTEORDER  BYTE_ORDER
 /* predefs from newer gcc and clang versions: */
 #elif defined(__ORDER_LITTLE_ENDIAN__) && defined(__ORDER_BIG_ENDIAN__) && defined(__BYTE_ORDER__)
-#if (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-#define PHYSFS_BYTEORDER   PHYSFS_LIL_ENDIAN
-#elif (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
-#define PHYSFS_BYTEORDER   PHYSFS_BIG_ENDIAN
+   #if (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+      #define PHYSFS_BYTEORDER   PHYSFS_LIL_ENDIAN
+   #elif (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
+      #define PHYSFS_BYTEORDER   PHYSFS_BIG_ENDIAN
+   #else
+      #error Unsupported endianness
+   #endif /**/
 #else
-#error Unsupported endianness
-#endif /**/
-#else
-#if defined(__hppa__) || \
-    defined(__m68k__) || defined(mc68000) || defined(_M_M68K) || \
-    (defined(__MIPS__) && defined(__MIPSEB__)) || \
-    defined(__ppc__) || defined(__POWERPC__) || defined(__powerpc__) || defined(__PPC__) || \
-    defined(__sparc__)
-#define PHYSFS_BYTEORDER   PHYSFS_BIG_ENDIAN
-#else
-#define PHYSFS_BYTEORDER   PHYSFS_LIL_ENDIAN
-#endif
+   #if defined(__hppa__) or defined(__m68k__) or defined(mc68000) or defined(_M_M68K) or \
+       (defined(__MIPS__) && defined(__MIPSEB__)) || \
+       defined(__ppc__) || defined(__POWERPC__) || defined(__powerpc__) || defined(__PPC__) || \
+       defined(__sparc__)
+      #define PHYSFS_BYTEORDER   PHYSFS_BIG_ENDIAN
+   #else
+      #define PHYSFS_BYTEORDER   PHYSFS_LIL_ENDIAN
+   #endif
 #endif /* __linux__ */
 
 
@@ -314,17 +301,17 @@ void __PHYSFS_sort(void *entries, size_t max,
 #define __PHYSFS_ARRAYLEN(x) ( (sizeof (x)) / (sizeof (x[0])) )
 
 #ifdef PHYSFS_NO_64BIT_SUPPORT
-#define __PHYSFS_SI64(x) ((PHYSFS_sint64) (x))
-#define __PHYSFS_UI64(x) ((PHYSFS_uint64) (x))
+   #define __PHYSFS_SI64(x) ((PHYSFS_sint64) (x))
+   #define __PHYSFS_UI64(x) ((PHYSFS_uint64) (x))
 #elif (defined __GNUC__)
-#define __PHYSFS_SI64(x) x##LL
-#define __PHYSFS_UI64(x) x##ULL
+   #define __PHYSFS_SI64(x) x##LL
+   #define __PHYSFS_UI64(x) x##ULL
 #elif (defined _MSC_VER)
-#define __PHYSFS_SI64(x) x##i64
-#define __PHYSFS_UI64(x) x##ui64
+   #define __PHYSFS_SI64(x) x##i64
+   #define __PHYSFS_UI64(x) x##ui64
 #else
-#define __PHYSFS_SI64(x) ((PHYSFS_sint64) (x))
-#define __PHYSFS_UI64(x) ((PHYSFS_uint64) (x))
+   #define __PHYSFS_SI64(x) ((PHYSFS_sint64) (x))
+   #define __PHYSFS_UI64(x) ((PHYSFS_uint64) (x))
 #endif
 
 
@@ -776,12 +763,3 @@ PHYSFS_uint32 __PHYSFS_utf8codepoint(const char **_str);
 #if PHYSFS_HAVE_PRAGMA_VISIBILITY
 #pragma GCC visibility pop
 #endif
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif
-
-/* end of physfs_internal.h ... */
-

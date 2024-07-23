@@ -8,9 +8,7 @@
  * This file was written by Francesco Bertolaccini, based on the UNPK archiver
  *  by Ryan C. Gordon and the works of degenerated1123 and Nico Bendlin.
  */
-
-#define __PHYSICSFS_INTERNAL__
-#include "physfs_internal.h"
+#include "physfs_internal.hpp"
 
 #if PHYSFS_SUPPORTS_VDF
 

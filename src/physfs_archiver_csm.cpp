@@ -31,9 +31,7 @@
  * This file written by Jon Daniel, based on the WAD archiver by
  *  Travis Wells.
  */
-
-#define __PHYSICSFS_INTERNAL__
-#include "physfs_internal.h"
+#include "physfs_internal.hpp"
 
 #if PHYSFS_SUPPORTS_CSM
 

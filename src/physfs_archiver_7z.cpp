@@ -5,13 +5,11 @@
  *
  *  This file was written by Ryan C. Gordon.
  */
-
-#define __PHYSICSFS_INTERNAL__
-#include "physfs_internal.h"
+#include "physfs_internal.hpp"
 
 #if PHYSFS_SUPPORTS_7Z
 
-#include "physfs_lzmasdk.h"
+#include "physfs_lzmasdk.hpp"
 
 typedef struct
 {
