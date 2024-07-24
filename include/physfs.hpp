@@ -1679,7 +1679,7 @@ protected:
 public:
    constexpr PHYSFS_DefaultAllocator() noexcept = default;
 
-   PHYSFS_DefaultAllocator(PHYSFS_integer auto count) {
+   PHYSFS_DefaultAllocator(PHYSFS_integer auto count, auto&&...arguments) {
       int c = static_cast<int>(count);
       if (not c)
          return;
@@ -1702,14 +1702,25 @@ public:
       *mReferences = 1;
 
       // Initialize all elements one by one (constructors might throw)  
-      if constexpr (::std::is_default_constructible_v<T>) {
-         for (int i = 0; i < c; ++i) {
-            new (mPointer + i) T();
-            ++mCount;
+      if constexpr (sizeof...(arguments) == 0) {
+         if constexpr (::std::is_default_constructible_v<T>) {
+            for (int i = 0; i < c; ++i) {
+               new (mPointer + i) T();
+               ++mCount;
+            }
          }
+      }
+      else if (c == 1) {
+         new (mPointer) T(::std::forward<::std::remove_reference_t<decltype(arguments)>>(arguments)...);
+         mCount = 1;
+      }
+      else for (int i = 0; i < c; ++i) {
+         new (mPointer + i) T(arguments...);
+         ++mCount;
       }
    }
    
+   METAPHYSFS(INLINED)
    constexpr PHYSFS_DefaultAllocator(const PHYSFS_DefaultAllocator& other) noexcept {
       mPointer = other.mPointer;
       mReferences = other.mReferences;
@@ -1718,6 +1729,7 @@ public:
          ++*mReferences;
    }
 
+   METAPHYSFS(INLINED)
    constexpr PHYSFS_DefaultAllocator(PHYSFS_DefaultAllocator&& other) noexcept {
       mPointer = other.mPointer;
       mReferences = other.mReferences;
@@ -1741,6 +1753,92 @@ public:
          free(mReferences);
       }
       else --*mReferences;
+   }
+
+   auto& operator = (const PHYSFS_DefaultAllocator& rhs) noexcept {
+      if (mReferences == rhs.mReferences)
+         return *this;
+
+      this->~PHYSFS_DefaultAllocator();
+      mPointer = rhs.mPointer;
+      mReferences = rhs.mReferences;
+      mCount = rhs.mCount;
+      if (mReferences)
+         ++*mReferences;
+      return *this;
+   }
+
+   auto& operator = (PHYSFS_DefaultAllocator&& rhs) noexcept {
+      if (mReferences == rhs.mReferences)
+         return *this;
+
+      this->~PHYSFS_DefaultAllocator();
+      mPointer = rhs.mPointer;
+      mReferences = rhs.mReferences;
+      mCount = rhs.mCount;
+      rhs.mReferences = nullptr;
+      rhs.mPointer = nullptr;
+      return *this;
+   }
+
+   /// Destroy a pointer                                                      
+   ///   @attention doesn't call any destructors                              
+   METAPHYSFS(INLINED) static void Free(void* ptr) {
+      free(ptr);
+   }
+
+   /// Reallocate a pointer                                                   
+   ///   @attention doesn't call any destructors                              
+   METAPHYSFS(INLINED) static void* Realloc(void* ptr, size_t bytes) {
+      return realloc(ptr, bytes);
+   }
+
+   /// Get the contained pointer                                              
+   ///   @return the contained pointer                                        
+   METAPHYSFS(INLINED) T* Get() noexcept {
+      return mPointer;
+   }
+   METAPHYSFS(INLINED) const T* Get() const noexcept {
+      return mPointer;
+   }
+
+   /// Add a reference, so that this handle never deallocates, and return raw 
+   /// pointer. This is allowed only if elements do not need their destructors
+   /// called. You will still have to free the returned pointer at some point 
+   ///   @return the contained pointer                                        
+   METAPHYSFS(INLINED) T* Ref() noexcept {
+      if (not mReferences)
+         return nullptr;
+      ++*mReferences;
+      return mPointer;
+   }
+
+   /// Access an element safely                                               
+   /// @param x - index of the element                                        
+   /// @return a reference to the x'th element                                
+   METAPHYSFS(INLINED)
+   decltype(auto) operator [] (PHYSFS_integer auto x) requires (not ::std::is_void_v<T>) {
+      if (not mReferences or static_cast<int>(x) >= mCount)
+         MetaPhysFS::Throw<PHYSFS_ERR_INVALID_ARGUMENT>();
+      return (mPointer[x]);
+   }
+
+   METAPHYSFS(INLINED) 
+   decltype(auto) operator [] (PHYSFS_integer auto x) const requires (not ::std::is_void_v<T>) {
+      if (not mReferences or static_cast<int>(x) >= mCount)
+         MetaPhysFS::Throw<PHYSFS_ERR_INVALID_ARGUMENT>();
+      return (mPointer[x]);
+   }
+
+   T* operator -> () requires (not ::std::is_void_v<T>) {
+      return mPointer;
+   }
+   T* operator -> () const requires (not ::std::is_void_v<T>) {
+      return mPointer;
+   }
+
+   constexpr explicit operator bool() const noexcept {
+      return mPointer != nullptr;
    }
 };
 
@@ -2760,7 +2858,7 @@ typedef struct PHYSFS_Io
     *   \param offset The new byte offset for the i/o position.
     *  \return non-zero on success, zero on error.
     */
-   int (*seek)(struct PHYSFS_Io* io, PHYSFS_uint64 offset);
+   int (*seek)(struct PHYSFS_Io* io, PHYSFS_uint64 offset); //TODO should throw!!!
 
    /**
     * \brief Report current i/o position.
@@ -2802,7 +2900,7 @@ typedef struct PHYSFS_Io
     *   \param io The i/o instance to duplicate.
     *  \return A new value for a stream's (opaque) field, or nullptr on error.
     */
-   PHYSFS_Allocator<PHYSFS_Io> (*duplicate)(PHYSFS_Io* io);
+   PHYSFS_Io* (*duplicate)(PHYSFS_Io* io);
 
    /**
     * \brief Flush resources to media, or wherever.

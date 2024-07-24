@@ -9,9 +9,6 @@
  *  by Ryan C. Gordon and the works of degenerated1123 and Nico Bendlin.
  */
 #include "physfs_internal.hpp"
-
-#if PHYSFS_SUPPORTS_VDF
-
 #include <time.h>
 
 #define VDF_COMMENT_LENGTH 256
@@ -161,7 +158,3 @@ const PHYSFS_Archiver __PHYSFS_Archiver_VDF =
     UNPK_stat,
     UNPK_closeArchive
 };
-
-#endif /* defined PHYSFS_SUPPORTS_VDF */
-
-/* end of physfs_archiver_vdf.c ... */

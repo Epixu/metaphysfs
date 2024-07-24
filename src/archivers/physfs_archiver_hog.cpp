@@ -41,15 +41,16 @@
  *
  * This file written by Bradley Bell and Ryan C. Gordon.
  */
-#include "physfs_internal.hpp"
+#include "../physfs_internal.hpp"
+#include "../physfs_unpk.hpp"
+#include <cassert>
 
-#if PHYSFS_SUPPORTS_HOG
 
 static int readui32(PHYSFS_Io *io, PHYSFS_uint32 *val)
 {
     PHYSFS_uint32 v;
     BAIL_IF_ERRPASS(!__PHYSFS_readAll(io, &v, sizeof (v)), 0);
-    *val = PHYSFS_swapULE32(v);
+    *val = PHYSFS_swapLE(v);
     return 1;
 } /* readui32 */
 
@@ -161,8 +162,3 @@ const PHYSFS_Archiver __PHYSFS_Archiver_HOG =
     UNPK_stat,
     UNPK_closeArchive
 };
-
-#endif  /* defined PHYSFS_SUPPORTS_HOG */
-
-/* end of physfs_archiver_hog.c ... */
-

@@ -43,7 +43,6 @@
  */
 #include "physfs_internal.hpp"
 
-#if PHYSFS_SUPPORTS_WAD
 
 static int wadLoadEntries(PHYSFS_Io *io, const PHYSFS_uint32 count, void *arc)
 {
@@ -126,8 +125,3 @@ const PHYSFS_Archiver __PHYSFS_Archiver_WAD =
     UNPK_stat,
     UNPK_closeArchive
 };
-
-#endif  /* defined PHYSFS_SUPPORTS_WAD */
-
-/* end of physfs_archiver_wad.c ... */
-

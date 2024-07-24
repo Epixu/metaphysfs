@@ -270,12 +270,9 @@ void PHYSFS_utf8ToUcs2(const char *src, PHYSFS_uint16 *dst, PHYSFS_uint64 len) {
     *dst = 0;
 }
 
-
-void PHYSFS_utf8ToUtf16(const char *src, PHYSFS_uint16 *dst, PHYSFS_uint64 len)
-{
+void PHYSFS_utf8ToUtf16(const char *src, PHYSFS_uint16 *dst, PHYSFS_uint64 len) {
     len -= sizeof (PHYSFS_uint16);   /* save room for null char. */
-    while (len >= sizeof (PHYSFS_uint16))
-    {
+    while (len >= sizeof (PHYSFS_uint16)) {
         PHYSFS_uint32 cp = __PHYSFS_utf8codepoint(&src);
         if (cp == 0)
             break;
@@ -293,14 +290,14 @@ void PHYSFS_utf8ToUtf16(const char *src, PHYSFS_uint16 *dst, PHYSFS_uint64 len)
             len -= sizeof (PHYSFS_uint16);
 
             cp = 0xDC00 + (cp & 0x3FF);
-        } /* if */
+        }
 
-        *(dst++) = cp;
+        *(dst++) = static_cast<PHYSFS_uint16>(cp);
         len -= sizeof (PHYSFS_uint16);
-    } /* while */
+    }
 
     *dst = 0;
-} /* PHYSFS_utf8ToUtf16 */
+}
 
 static void utf8fromcodepoint(PHYSFS_uint32 cp, char **_dst, PHYSFS_uint64 *_len)
 {

@@ -53,7 +53,7 @@ namespace
       return 1;
    }
 
-   void* QPAK_openArchive(PHYSFS_Io* io, const char* name, int forWriting, int* claimed) {
+   void* QPAK_openArchive(PHYSFS_Io* io, const char*, int forWriting, int* claimed) {
       PHYSFS_uint32 val = 0;
       PHYSFS_uint32 pos = 0;
       PHYSFS_uint32 count = 0;

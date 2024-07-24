@@ -7,17 +7,15 @@
  *   by Gilles Vollant.
  */
 #include "physfs_internal.hpp"
-
-#if PHYSFS_SUPPORTS_ZIP
-
 #include <errno.h>
 #include <time.h>
 
 #if (PHYSFS_BYTEORDER == PHYSFS_LIL_ENDIAN)
-#define MINIZ_LITTLE_ENDIAN 1
+   #define MINIZ_LITTLE_ENDIAN 1
 #else
-#define MINIZ_LITTLE_ENDIAN 0
+   #define MINIZ_LITTLE_ENDIAN 0
 #endif
+
 #include "physfs_miniz.hpp"
 
 /*
@@ -1709,8 +1707,3 @@ const PHYSFS_Archiver __PHYSFS_Archiver_ZIP =
     ZIP_stat,
     ZIP_closeArchive
 };
-
-#endif  /* defined PHYSFS_SUPPORTS_ZIP */
-
-/* end of physfs_archiver_zip.c ... */
-

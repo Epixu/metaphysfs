@@ -1,35 +1,32 @@
-/*
- * ISO9660 support routines for PhysicsFS.
- *
- * Please see the file LICENSE.txt in the source's root directory.
- *
- *  This file originally written by Christoph Nelles, but was largely
- *  rewritten by Ryan C. Gordon (so please harass Ryan about bugs and not
- *  Christoph).
- */
-
-/*
- * Handles CD-ROM disk images (and raw CD-ROM devices).
- *
- * Not supported:
- * - Rock Ridge (needed for sparse files, device nodes and symlinks, etc).
- * - Non 2048 Sectors
- * - TRANS.TBL (maps 8.3 filenames on old discs to long filenames).
- * - Multiextents (4gb max file size without it).
- * - UDF
- *
- * Deviations from the standard
- * - Ignores mandatory sort order
- * - Allows various invalid file names
- *
- * Problems
- * - Ambiguities in the standard
- */
+///                                                                           
+/// ISO9660 support routines for PhysicsFS.                                   
+///                                                                           
+/// Please see the file LICENSE.txt in the source's root directory.           
+///                                                                           
+/// This file originally written by Christoph Nelles, but was largely         
+/// rewritten by Ryan C. Gordon (so please harass Ryan about bugs and not     
+/// Christoph).                                                               
+///                                                                           
+///                                                                           
+/// Handles CD-ROM disk images (and raw CD-ROM devices).                      
+///                                                                           
+/// Not supported:                                                            
+/// - Rock Ridge (needed for sparse files, device nodes and symlinks, etc).   
+/// - Non 2048 Sectors                                                        
+/// - TRANS.TBL (maps 8.3 filenames on old discs to long filenames).          
+/// - Multiextents (4gb max file size without it).                            
+/// - UDF                                                                     
+///                                                                           
+/// Deviations from the standard                                              
+/// - Ignores mandatory sort order                                            
+/// - Allows various invalid file names                                       
+///                                                                           
+/// Problems                                                                  
+/// - Ambiguities in the standard                                             
+///                                                                           
 #include "physfs_internal.hpp"
-
-#if PHYSFS_SUPPORTS_ISO9660
-
 #include <time.h>
+
 
 /* ISO9660 often stores values in both big and little endian formats: little
    first, followed by big. While technically there might be different values
@@ -378,8 +375,3 @@ const PHYSFS_Archiver __PHYSFS_Archiver_ISO9660 =
     UNPK_stat,
     UNPK_closeArchive
 };
-
-#endif  /* defined PHYSFS_SUPPORTS_ISO9660 */
-
-/* end of physfs_archiver_iso9660.c ... */
-

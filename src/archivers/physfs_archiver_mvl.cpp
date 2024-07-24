@@ -27,6 +27,7 @@
 ///  Based on grp.c by Ryan C. Gordon.
 /// 
 #include "physfs_internal.hpp"
+#include "physfs_unpk.hpp"
 #include <cassert>
 #include <cstring>
 

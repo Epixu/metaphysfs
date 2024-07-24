@@ -23,7 +23,7 @@
 ///                                                                           
 /// This file written by Ryan C. Gordon.                                      
 ///                                                                           
-#include "physfs_internal.hpp"
+#include "../physfs_internal.hpp"
 #include <cassert>
 
 
@@ -42,8 +42,8 @@ namespace
 
          name[12] = '\0';  // Name isn't null-terminated in file        
 
-         char* ptr;
-         if ((ptr = strchr(name, ' ')))
+         auto ptr = strchr(name, ' ');
+         if (ptr)
             *ptr = '\0';   // Trim extra spaces                         
 
          size = PHYSFS_swapLE(size);
@@ -82,10 +82,8 @@ namespace
    }
 }
 
-const PHYSFS_Archiver __PHYSFS_Archiver_GRP =
-{
-    CURRENT_PHYSFS_ARCHIVER_API_VERSION,
-    {
+const PHYSFS_Archiver __PHYSFS_Archiver_GRP = {
+    CURRENT_PHYSFS_ARCHIVER_API_VERSION, {
         "GRP",
         "Build engine Groupfile format",
         "Ryan C. Gordon <icculus@icculus.org>",

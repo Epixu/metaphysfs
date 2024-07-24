@@ -27,6 +27,7 @@
    #define _FILE_OFFSET_BITS 64
 #endif
 
+
 /// These are the build-in archivers. We list them all as "extern" here       
 /// without #ifdefs to keep it tidy, but obviously you need to make sure      
 /// these are wrapped in PHYSFS_SUPPORTS_* checks before actually referencing 
@@ -81,77 +82,85 @@ extern const PHYSFS_Archiver __PHYSFS_Archiver_VDF;
 #endif
 
 
-/*
- * Interface for small allocations. If you need a little scratch space for
- *  a throwaway buffer or string, use this. It will make small allocations
- *  on the stack if possible, and use allocator.Malloc() if they are too
- *  large. This helps reduce malloc pressure.
- * There are some rules, though:
- * NEVER return a pointer from this, as stack-allocated buffers go away
- *  when your function returns.
- * NEVER allocate in a loop, as stack-allocated pointers will pile up. Call
- *  a function that uses smallAlloc from your loop, so the allocation can
- *  free each time.
- * NEVER call smallAlloc with any complex expression (it's a macro that WILL
- *  have side effects...it references the argument multiple times). Use a
- *  variable or a literal.
- * NEVER free a pointer from this with anything but smallFree. It will not
- *  be a valid pointer to the allocator, regardless of where the memory came
- *  from.
- * NEVER realloc a pointer from this.
- * NEVER forget to use smallFree: it may not be a pointer from the stack.
- * NEVER forget to check for nullptr...allocation can fail here, of course!
- */
-#define __PHYSFS_SMALLALLOCTHRESHOLD 256
-void* __PHYSFS_initSmallAlloc(void* ptr, const size_t len);
+///                                                                           
+/// Interface for small allocations. If you need a little scratch space for   
+/// a throwaway buffer or string, use this. It will make small allocations    
+/// on the stack if possible, and use allocator.Malloc() if they are too      
+/// large. This helps reduce malloc pressure.                                 
+/// There are some rules, though:                                             
+/// NEVER return a pointer from this, as stack-allocated buffers go away      
+///  when your function returns.                                              
+/// NEVER allocate in a loop, as stack-allocated pointers will pile up. Call  
+///  a function that uses smallAlloc from your loop, so the allocation can    
+///  free each time.                                                          
+/// NEVER call smallAlloc with any complex expression (it's a macro that WILL 
+///  have side effects...it references the argument multiple times). Use a    
+///  variable or a literal.                                                   
+/// NEVER free a pointer from this with anything but smallFree. It will not   
+///  be a valid pointer to the allocator, regardless of where the memory came 
+///  from.                                                                    
+/// NEVER realloc a pointer from this.                                        
+/// NEVER forget to use smallFree: it may not be a pointer from the stack.    
+/// NEVER forget to check for nullptr...allocation can fail here, of course!  
+///                                                                           
+constexpr size_t __PHYSFS_SMALLALLOCTHRESHOLD = 256;
+void* __PHYSFS_initSmallAlloc(void*, const size_t);
 
-#define __PHYSFS_smallAlloc(bytes) ( \
-    __PHYSFS_initSmallAlloc( \
-        (((bytes) < __PHYSFS_SMALLALLOCTHRESHOLD) ? \
-            alloca((size_t)((bytes)+sizeof(void*))) : nullptr), (bytes)) \
-)
+METAPHYSFS(INLINED)
+void* __PHYSFS_smallAlloc(const size_t len) {
+   return __PHYSFS_initSmallAlloc(
+      len < __PHYSFS_SMALLALLOCTHRESHOLD
+         ? alloca(len + sizeof(void*)) : nullptr,
+      len
+   );
+}
 
-void __PHYSFS_smallFree(void* ptr);
+void __PHYSFS_smallFree(void*);
 
 
-/* Use the allocation hooks. */
-#define malloc(x) Do not use malloc() directly.
-#define realloc(x, y) Do not use realloc() directly.
-#define free(x) Do not use free() directly.
-/* !!! FIXME: add alloca check here. */
+/// Use the allocation hooks                                                  
+#undef malloc
+#undef realloc
+#undef free
+#undef alloca
+
+#define malloc(x)       Do not use malloc() directly.
+#define realloc(x, y)   Do not use realloc() directly.
+#define free(x)         Do not use free() directly.
+#define alloca(x)       Do not use alloca() directly.
 
 #if PHYSFS_SUPPORTS_7Z
-   /* 7zip support needs a global init function called at startup (no deinit). */
+   /// 7zip support needs a global init function called at startup (no deinit)
    extern void SZIP_global_init(void);
 #endif
 
-/* The latest supported PHYSFS_Io::version value. */
+/// The latest supported PHYSFS_Io::version value                             
 #define CURRENT_PHYSFS_IO_API_VERSION 0
 
-/* The latest supported PHYSFS_Archiver::version value. */
+/// The latest supported PHYSFS_Archiver::version value                       
 #define CURRENT_PHYSFS_ARCHIVER_API_VERSION 0
 
-/*
- * When sorting the entries in an archive, we use a modified QuickSort.
- *  When there are less then PHYSFS_QUICKSORT_THRESHOLD entries left to sort,
- *  we switch over to a BubbleSort for the remainder. Tweak to taste.
- *
- * You can override this setting by defining PHYSFS_QUICKSORT_THRESHOLD
- *  before #including "physfs_internal.h".
- */
+///                                                                           
+/// When sorting the entries in an archive, we use a modified QuickSort.      
+/// When there are less then PHYSFS_QUICKSORT_THRESHOLD entries left to sort, 
+/// we switch over to a BubbleSort for the remainder. Tweak to taste.         
+///                                                                           
+/// You can override this setting by defining PHYSFS_QUICKSORT_THRESHOLD      
+/// before #including "physfs_internal.h".                                    
+///                                                                           
 #ifndef PHYSFS_QUICKSORT_THRESHOLD
-#define PHYSFS_QUICKSORT_THRESHOLD 4
+   #define PHYSFS_QUICKSORT_THRESHOLD 4
 #endif
 
- /*
-  * Sort an array (or whatever) of (max) elements. This uses a mixture of
-  *  a QuickSort and BubbleSort internally.
-  * (cmpfn) is used to determine ordering, and (swapfn) does the actual
-  *  swapping of elements in the list.
-  */
-void __PHYSFS_sort(void* entries, size_t max,
-   int (*cmpfn)(void*, size_t, size_t),
-   void (*swapfn)(void*, size_t, size_t));
+/// Sort an array (or whatever) of (max) elements. This uses a mixture of     
+/// a QuickSort and BubbleSort internally.                                    
+/// (cmpfn) is used to determine ordering, and (swapfn) does the actual       
+/// swapping of elements in the list.                                         
+void __PHYSFS_sort(
+   void* entries, size_t max,
+   int  (*cmpfn)(void*, size_t, size_t),
+   void (*swapfn)(void*, size_t, size_t)
+);
 
 /* These get used all over for lessening code clutter. */
 /* "ERRPASS" means "something else just set the error state for us" and is
@@ -221,15 +230,6 @@ PHYSFS_uint32 __PHYSFS_hashStringCaseFold(const char* str);
  */
 PHYSFS_uint32 __PHYSFS_hashStringCaseFoldUSAscii(const char* str);
 
-
-/*
- * The current allocator. Not valid before PHYSFS_init is called!
- */
-//extern PHYSFS_Allocator __PHYSFS_AllocatorHooks;
-
-/* convenience macro to make this less cumbersome internally... */
-//#define allocator __PHYSFS_AllocatorHooks
-
 /*
  * Create a PHYSFS_Io for a file in the physical filesystem.
  *  This path is in platform-dependent notation. (mode) must be 'r', 'w', or
@@ -251,58 +251,6 @@ PHYSFS_Io* __PHYSFS_createMemoryIo(const void* buf, PHYSFS_uint64 len,
  *  zero on i/o error. Literally: "return (io->read(io, buf, len) == len);"
  */
 int __PHYSFS_readAll(PHYSFS_Io* io, void* buf, const size_t len);
-
-
-/* These are shared between some archivers. */
-
-/* LOTS of legacy formats that only use US ASCII, not actually UTF-8, so let them optimize here. */
-void* UNPK_openArchive(PHYSFS_Io* io, const int case_sensitive, const int only_usascii);
-void UNPK_abandonArchive(void* opaque);
-void UNPK_closeArchive(void* opaque);
-void* UNPK_addEntry(void* opaque, char* name, const int isdir,
-   const PHYSFS_sint64 ctime, const PHYSFS_sint64 mtime,
-   const PHYSFS_uint64 pos, const PHYSFS_uint64 len);
-PHYSFS_Io* UNPK_openRead(void* opaque, const char* name);
-PHYSFS_Io* UNPK_openWrite(void* opaque, const char* name);
-PHYSFS_Io* UNPK_openAppend(void* opaque, const char* name);
-int UNPK_remove(void* opaque, const char* name);
-int UNPK_mkdir(void* opaque, const char* name);
-int UNPK_stat(void* opaque, const char* fn, PHYSFS_Stat* st);
-#define UNPK_enumerate __PHYSFS_DirTreeEnumerate
-
-
-
-/* Optional API many archivers use this to manage their directory tree. */
-/* !!! FIXME: document this better. */
-
-typedef struct __PHYSFS_DirTreeEntry
-{
-   char* name;                              /* Full path in archive.        */
-   struct __PHYSFS_DirTreeEntry* hashnext;  /* next item in hash bucket.    */
-   struct __PHYSFS_DirTreeEntry* children;  /* linked list of kids, if dir. */
-   struct __PHYSFS_DirTreeEntry* sibling;   /* next item in same dir.       */
-   int isdir;
-} __PHYSFS_DirTreeEntry;
-
-typedef struct __PHYSFS_DirTree
-{
-   __PHYSFS_DirTreeEntry* root;    /* root of directory tree.             */
-   __PHYSFS_DirTreeEntry** hash;  /* all entries hashed for fast lookup. */
-   size_t hashBuckets;            /* number of buckets in hash.          */
-   size_t entrylen;    /* size in bytes of entries (including subclass). */
-   int case_sensitive;  /* non-zero to treat entries as case-sensitive in DirTreeFind */
-   int only_usascii;  /* non-zero to treat paths as US ASCII only (one byte per char, only 'A' through 'Z' are considered for case folding). */
-} __PHYSFS_DirTree;
-
-
-/* LOTS of legacy formats that only use US ASCII, not actually UTF-8, so let them optimize here. */
-int __PHYSFS_DirTreeInit(__PHYSFS_DirTree* dt, const size_t entrylen, const int case_sensitive, const int only_usascii);
-void* __PHYSFS_DirTreeAdd(__PHYSFS_DirTree* dt, char* name, const int isdir);
-void* __PHYSFS_DirTreeFind(__PHYSFS_DirTree* dt, const char* path);
-PHYSFS_EnumerateCallbackResult __PHYSFS_DirTreeEnumerate(void* opaque,
-   const char* dname, PHYSFS_EnumerateCallback cb,
-   const char* origdir, void* callbackdata);
-void __PHYSFS_DirTreeDeinit(__PHYSFS_DirTree* dt);
 
 
 
@@ -628,8 +576,3 @@ void __PHYSFS_platformReleaseMutex(void* mutex);
 
 /* !!! FIXME: move to public API? */
 PHYSFS_uint32 __PHYSFS_utf8codepoint(const char** _str);
-
-
-#if PHYSFS_HAVE_PRAGMA_VISIBILITY
-#pragma GCC visibility pop
-#endif

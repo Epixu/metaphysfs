@@ -6,9 +6,7 @@
  *
  * Please see the file LICENSE.txt in the source's root directory.
  */
-
-#ifndef _INCLUDE_PHYSFS_CASEFOLDING_H_
-#define _INCLUDE_PHYSFS_CASEFOLDING_H_
+#pragma once
 
 /* We build three simple hashmaps here: one that maps Unicode codepoints to
 a one, two, or three lowercase codepoints. To retrieve this info: look at
@@ -2746,9 +2744,3 @@ static const CaseFoldHashBucket3_16 case_fold_hash3_16[] = {
     { nullptr, 0 },
     { case_fold3_16_003, __PHYSFS_ARRAYLEN(case_fold3_16_003) },
 };
-
-
-#endif  /* _INCLUDE_PHYSFS_CASEFOLDING_H_ */
-
-/* end of physfs_casefolding.h ... */
-

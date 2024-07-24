@@ -65,7 +65,7 @@ namespace
       return 1;
    }
 
-   void* CSM_openArchive(PHYSFS_Io* io, const char* name, int forWriting, int* claimed) {
+   void* CSM_openArchive(PHYSFS_Io* io, const char*, int forWriting, int* claimed) {
       PHYSFS_uint8 buf[4];
       PHYSFS_uint16 count;
       void* unpkarc;

@@ -10,6 +10,32 @@
 #  testing in here.
 cmake_minimum_required(VERSION 3.28)
 include(GNUInstallDirs)
+include(FetchContent)
+
+function(fetch_external_module NAME GIT_REPOSITORY REPO GIT_TAG TAG)
+    if(NOT DEFINED METAPHYSFS_EXTERNAL_DIRECTORY)
+        set(METAPHYSFS_EXTERNAL_DIRECTORY "${CMAKE_SOURCE_DIR}/external" CACHE PATH
+            "Place where external dependencies will be downloaded and configured")
+        message(WARNING "METAPHYSFS_EXTERNAL_DIRECTORY not defined, using default: ${METAPHYSFS_EXTERNAL_DIRECTORY}")
+    endif()
+
+    message(STATUS "Fetching external library ${NAME}...")
+    FetchContent_Declare(
+        ${NAME}
+        GIT_REPOSITORY  ${REPO}
+        GIT_TAG         ${TAG}
+        SOURCE_DIR      "${METAPHYSFS_EXTERNAL_DIRECTORY}/${NAME}-src"
+        SUBBUILD_DIR    "${CMAKE_BINARY_DIR}/external/${NAME}-subbuild"
+        ${ARGN}
+		EXCLUDE_FROM_ALL
+    )
+    FetchContent_MakeAvailable(${NAME})
+	
+	string(TOLOWER ${NAME} LOWERCASE_NAME)
+    set(${NAME}_SOURCE_DIR "${${LOWERCASE_NAME}_SOURCE_DIR}" CACHE INTERNAL "${NAME} source directory")
+    set(${NAME}_BINARY_DIR "${${LOWERCASE_NAME}_BINARY_DIR}" CACHE INTERNAL "${NAME} binary directory")
+endfunction()
+
 
 set(PHYSFS_VERSION 3.3.0)
 # Increment this if/when we break backwards compatibility						
@@ -103,30 +129,50 @@ endif()
 set(PHYSFS_SRCS
     src/physfs.cpp
     src/physfs_unicode.cpp
-    src/physfs_platform_posix.cpp
-    src/physfs_platform_unix.cpp
-    src/physfs_platform_windows.cpp
-    src/physfs_platform_ogc.cpp
-    src/physfs_platform_os2.cpp
-    src/physfs_platform_qnx.cpp
-    src/physfs_platform_android.cpp
-    src/physfs_platform_playdate.cpp
-    src/physfs_archiver_dir.cpp
-    src/physfs_archiver_unpacked.cpp
-	$<$<BOOL:${METAPHYSFS_ARCHIVE_GRP}>:src/physfs_archiver_grp.cpp>
-	$<$<BOOL:${METAPHYSFS_ARCHIVE_HOG}>:src/physfs_archiver_hog.cpp>
-	$<$<BOOL:${METAPHYSFS_ARCHIVE_7Z}>:src/physfs_archiver_7z.cpp>
-	$<$<BOOL:${METAPHYSFS_ARCHIVE_MVL}>:src/physfs_archiver_mvl.cpp>
-	$<$<BOOL:${METAPHYSFS_ARCHIVE_QPAK}>:src/physfs_archiver_qpak.cpp>
-	$<$<BOOL:${METAPHYSFS_ARCHIVE_WAD}>:src/physfs_archiver_wad.cpp>
-	$<$<BOOL:${METAPHYSFS_ARCHIVE_CSM}>:src/physfs_archiver_csm.cpp>
-	$<$<BOOL:${METAPHYSFS_ARCHIVE_ZIP}>:src/physfs_archiver_zip.cpp>
-	$<$<BOOL:${METAPHYSFS_ARCHIVE_SLB}>:src/physfs_archiver_slb.cpp>
-	$<$<BOOL:${METAPHYSFS_ARCHIVE_ISO9660}>:src/physfs_archiver_iso9660.cpp>
-	$<$<BOOL:${METAPHYSFS_ARCHIVE_VDF}>:src/physfs_archiver_vdf.cpp>
+
+    src/platforms/physfs_platform_posix.cpp
+    src/platforms/physfs_platform_unix.cpp
+    src/platforms/physfs_platform_windows.cpp
+    src/platforms/physfs_platform_ogc.cpp
+    src/platforms/physfs_platform_os2.cpp
+    src/platforms/physfs_platform_qnx.cpp
+    src/platforms/physfs_platform_android.cpp
+    src/platforms/physfs_platform_playdate.cpp
+
+    src/archivers/physfs_archiver_dir.cpp
+    src/archivers/physfs_archiver_unpacked.cpp
+	$<$<BOOL:${METAPHYSFS_ARCHIVE_GRP}>:		src/archivers/physfs_archiver_grp.cpp>
+	$<$<BOOL:${METAPHYSFS_ARCHIVE_HOG}>:		src/archivers/physfs_archiver_hog.cpp>
+	$<$<BOOL:${METAPHYSFS_ARCHIVE_7Z}>:			src/archivers/physfs_archiver_7z.cpp>
+	$<$<BOOL:${METAPHYSFS_ARCHIVE_MVL}>:		src/archivers/physfs_archiver_mvl.cpp>
+	$<$<BOOL:${METAPHYSFS_ARCHIVE_QPAK}>:		src/archivers/physfs_archiver_qpak.cpp>
+	$<$<BOOL:${METAPHYSFS_ARCHIVE_WAD}>:		src/archivers/physfs_archiver_wad.cpp>
+	$<$<BOOL:${METAPHYSFS_ARCHIVE_CSM}>:		src/archivers/physfs_archiver_csm.cpp>
+	$<$<BOOL:${METAPHYSFS_ARCHIVE_ZIP}>:		src/archivers/physfs_archiver_zip.cpp>
+	$<$<BOOL:${METAPHYSFS_ARCHIVE_SLB}>:		src/archivers/physfs_archiver_slb.cpp>
+	$<$<BOOL:${METAPHYSFS_ARCHIVE_ISO9660}>:	src/archivers/physfs_archiver_iso9660.cpp>
+	$<$<BOOL:${METAPHYSFS_ARCHIVE_VDF}>:		src/archivers/physfs_archiver_vdf.cpp>
     ${PHYSFS_CPP_SRCS}
     ${PHYSFS_M_SRCS}
 )
+
+if(METAPHYSFS_ARCHIVE_7Z)
+	fetch_external_module(
+		7zip
+		GIT_REPOSITORY  https://github.com/ip7z/7zip.git
+		GIT_TAG         a7a1d4a241492e81f659a920f7379c193593ebc6 # v24.07
+	)
+
+	include(ExternalProject)
+	ExternalProject_Add(7zip
+        PREFIX "${7zip_BINARY_DIR}/C"
+        DEPENDS ""
+        SOURCE_DIR "${7zip_SOURCE_DIR}/C"
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND make -j8
+        INSTALL_COMMAND ""
+	)
+endif()
 
 if(PHYSFS_BUILD_STATIC)
     add_library(physfs-static STATIC ${PHYSFS_SRCS})
@@ -149,7 +195,13 @@ if(PHYSFS_BUILD_STATIC)
         target_compile_definitions(physfs-static PRIVATE "PHYSFS_STATIC")
     endif()
 
-	target_link_libraries(physfs-static PUBLIC MetaPhysicsFSCommon)
+	target_link_libraries(physfs-static
+		PUBLIC  MetaPhysicsFSCommon
+		PRIVATE $<$<BOOL:${METAPHYSFS_ARCHIVE_7Z}>:7zip>
+	)
+	target_include_directories(physfs-static
+		PRIVATE $<$<BOOL:${METAPHYSFS_ARCHIVE_7Z}>:${7zip_SOURCE_DIR}/C>
+	)
 
     set(PHYSFS_LIB_TARGET PhysFS::PhysFS-static)
     list(APPEND PHYSFS_INSTALL_TARGETS "physfs-static")
@@ -169,7 +221,13 @@ if(PHYSFS_BUILD_SHARED)
         set_target_properties(physfs PROPERTIES OUTPUT_NAME "physfs")
     endif()
 
-	target_link_libraries(physfs PUBLIC MetaPhysicsFSCommon)
+	target_link_libraries(physfs
+		PUBLIC	MetaPhysicsFSCommon
+		PRIVATE $<$<BOOL:${METAPHYSFS_ARCHIVE_7Z}>:7zip>
+	)
+	target_include_directories(physfs
+		PRIVATE $<$<BOOL:${METAPHYSFS_ARCHIVE_7Z}>:${7zip_SOURCE_DIR}/C>
+	)
 
     set(PHYSFS_LIB_TARGET PhysFS::PhysFS)
     list(APPEND PHYSFS_INSTALL_TARGETS "physfs")

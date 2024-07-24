@@ -3,7 +3,7 @@
 /// Please see the file LICENSE.txt in the source's root directory.           
 ///  This file written by Ryan C. Gordon.                                     
 ///                                                                           
-#include "physfs_internal.hpp"
+#include "../physfs_internal.hpp"
 #include <cstring>
 #include <cassert>
 
@@ -29,35 +29,33 @@ namespace
        buf = cvtToDependent((char*)pre,dir,(char*)__PHYSFS_smallAlloc(len),len); \
    }
 
-   void* DIR_openArchive(PHYSFS_Io* io, const char* name, int forWriting, int* claimed) {
+   void* DIR_openArchive(PHYSFS_Io* io, const char* name, int /*forWriting*/, int* claimed) {
       PHYSFS_Stat st;
       const char dirsep = __PHYSFS_platformDirSeparator;
-      char* retval = nullptr;
       const size_t namelen = strlen(name);
       const size_t seplen = 1;
 
-      assert(io == nullptr);  /* shouldn't create an Io for these. */
+      assert(io == nullptr);  // Shouldn't create an Io for these       
       BAIL_IF_ERRPASS(!__PHYSFS_platformStat(name, &st, 1), nullptr);
       BAIL_IF(st.filetype != PHYSFS_FILETYPE_DIRECTORY, PHYSFS_ERR_UNSUPPORTED, nullptr);
 
       *claimed = 1;
-      retval = PHYSFS_Allocator::Malloc<char>(namelen + seplen + 1);
-      BAIL_IF(not retval, PHYSFS_ERR_OUT_OF_MEMORY, nullptr);
+      auto retval = PHYSFS_Allocator<char>(namelen + seplen + 1);
+      strcpy(retval.Get(), name);
 
-      strcpy(retval, name);
-
-      /* make sure there's a dir separator at the end of the string */
+      // Make sure there's a dir separator at the end of the string     
       if (retval[namelen - 1] != dirsep) {
          retval[namelen] = dirsep;
          retval[namelen + 1] = '\0';
       }
 
-      return retval;
+      return retval.Ref();
    }
 
    PHYSFS_EnumerateCallbackResult DIR_enumerate(void* opaque,
       const char* dname, PHYSFS_EnumerateCallback cb,
-      const char* origdir, void* callbackdata) {
+      const char* origdir, void* callbackdata
+   ) {
       char* d;
       PHYSFS_EnumerateCallbackResult retval;
       CVT_TO_DEPENDENT(d, opaque, dname);
@@ -121,7 +119,7 @@ namespace
    }
 
    void DIR_closeArchive(void* opaque) {
-      PHYSFS_Allocator::Free(opaque);
+      PHYSFS_Allocator<>::Free(opaque);
    }
 
    int DIR_stat(void* opaque, const char* name, PHYSFS_Stat* stat) {

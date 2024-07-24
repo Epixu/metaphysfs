@@ -9,3 +9,4 @@ CMakeDoxy*
 extras/physfs.pc
 Doxyfile
 out
+external

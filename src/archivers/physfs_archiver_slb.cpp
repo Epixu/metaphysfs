@@ -16,7 +16,6 @@
  */
 #include "physfs_internal.hpp"
 
-#if PHYSFS_SUPPORTS_SLB
 
 static int slbLoadEntries(PHYSFS_Io *io, const PHYSFS_uint32 count, void *arc)
 {
@@ -128,7 +127,3 @@ const PHYSFS_Archiver __PHYSFS_Archiver_SLB =
     UNPK_stat,
     UNPK_closeArchive
 };
-
-#endif  /* defined PHYSFS_SUPPORTS_SLB */
-
-/* end of physfs_archiver_slb.c ... */
